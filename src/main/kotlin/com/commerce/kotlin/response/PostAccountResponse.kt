@@ -1,6 +1,6 @@
 package com.commerce.kotlin.response
 
-class CreateAccountResponse (
+class PostAccountResponse (
     val id: Long
 ) {
 }

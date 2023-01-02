@@ -1,7 +1,10 @@
 package com.commerce.kotlin.controller
 
 import com.commerce.kotlin.dto.CreateAccountDto
-import com.commerce.kotlin.response.CreateAccountResponse
+import com.commerce.kotlin.entity.Account
+import com.commerce.kotlin.repository.AccountRepository
+import com.commerce.kotlin.response.GetAccountResponse
+import com.commerce.kotlin.response.PostAccountResponse
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,17 +22,19 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 class AccountControllerTest(
     @Autowired
     private val mockMvc: MockMvc,
+    @Autowired
+    private val accountRepository: AccountRepository
 ){
 
     @Test
-    fun createAccount() {
+    fun postAccount() {
         val createAccountDto = CreateAccountDto(
             email = "",
             phoneNumber = "010-1111-2222",
             password = "1111"
         );
 
-        val createAccountResponse = CreateAccountResponse(id = 1L);
+        val createAccountResponse = PostAccountResponse(id = 1L);
 
         this.mockMvc.perform(
             post("/accounts")
@@ -41,9 +46,21 @@ class AccountControllerTest(
     }
 
     @Test
-    fun findAccount() {
-        this.mockMvc.perform(get("/accounts"))
+    fun getAccount() {
+        val createAccount = Account(
+            email = "a@a.com",
+            phoneNumber = "010-1111-2222",
+            password = "1234"
+        )
+        val account = this.accountRepository.save(createAccount);
+
+        val getAccountResponse = GetAccountResponse(
+            email = createAccount.email,
+            phoneNumber = createAccount.phoneNumber
+        );
+
+        this.mockMvc.perform(get("/accounts/${account.id}"))
             .andExpect(status().isOk)
-            .andExpect(content().string("hi"))
+            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getAccountResponse)));
     }
 }
