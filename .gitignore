@@ -1,0 +1,7 @@
+build/
+.idea/
+*.iml
+.gradle/
+/out/
+*.jar
+gradle-app.setting
