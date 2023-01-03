@@ -14,8 +14,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MockMvcBuilder
+import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
 
 //@WebMvcTest
@@ -23,12 +27,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 @SpringBootTest
 class AccountControllerTest(
     @Autowired
-    private val mockMvc: MockMvc,
+    private var mockMvc: MockMvc,
     @Autowired
     private val accountRepository: AccountRepository,
 ){
 
-    private val faker = Faker();
+    private val faker = Faker()
 
     @AfterEach
     fun deleteAll() {
@@ -53,6 +57,7 @@ class AccountControllerTest(
         )
             .andExpect(status().isCreated)
             .andExpect(content().json(jacksonObjectMapper().writeValueAsString(createAccountResponse)));
+
     }
 
     @Test

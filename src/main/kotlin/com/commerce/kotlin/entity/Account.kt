@@ -3,6 +3,8 @@ package com.commerce.kotlin.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
 import org.hibernate.annotations.Where
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -18,6 +20,11 @@ class Account(
     @Id
     @GeneratedValue
     val id: Long? = null;
+
+    @OneToOne
+    @JoinColumn(name = "customer_id")
+    var customer: Customer? = null
+        private set;
 
     var email = email
         private set;
@@ -37,7 +44,7 @@ class Account(
     val updateAt: LocalDateTime = LocalDateTime.now();
 
     fun remove() {
-        this.deleted = true
+        this.deleted = true;
     }
 
     fun update(phoneNumber: String?, password: String?) {
@@ -46,11 +53,15 @@ class Account(
         }
 
         if(password !== null) {
-            this.password = password
+            this.password = password;
         }
     }
 
     fun authenticate(password: String): Boolean {
         return this.password == password;
+    }
+
+    fun setCustomer(customer: Customer) {
+        this.customer = customer;
     }
 }
