@@ -2,7 +2,7 @@ package com.commerce.kotlin.dto
 
 import jakarta.validation.constraints.NotBlank
 
-class CreateAccountDto(
+data class CreateAccountDto(
     @NotBlank
     var email: String,
 

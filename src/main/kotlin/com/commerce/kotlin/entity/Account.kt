@@ -49,4 +49,8 @@ class Account(
             this.password = password
         }
     }
+
+    fun authenticate(password: String): Boolean {
+        return this.password == password;
+    }
 }

@@ -6,6 +6,8 @@ import com.commerce.kotlin.repository.AccountRepository
 import com.commerce.kotlin.response.GetAccountResponse
 import com.commerce.kotlin.response.PostAccountResponse
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import net.datafaker.Faker
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -23,15 +25,23 @@ class AccountControllerTest(
     @Autowired
     private val mockMvc: MockMvc,
     @Autowired
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
 ){
+
+    private val faker = Faker();
+
+    @AfterEach
+    fun deleteAll() {
+        this.accountRepository.deleteAll();
+    }
 
     @Test
     fun postAccount() {
+
         val createAccountDto = CreateAccountDto(
-            email = "",
-            phoneNumber = "010-1111-2222",
-            password = "1111"
+            email = this.faker.internet().emailAddress(),
+            phoneNumber = this.faker.phoneNumber().phoneNumber(),
+            password = this.faker.internet().password()
         );
 
         val createAccountResponse = PostAccountResponse(id = 1L);
@@ -48,9 +58,9 @@ class AccountControllerTest(
     @Test
     fun getAccount() {
         val createAccount = Account(
-            email = "a@a.com",
-            phoneNumber = "010-1111-2222",
-            password = "1234"
+            email = faker.internet().emailAddress(),
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
         )
         val account = this.accountRepository.save(createAccount);
 

@@ -1,6 +1,6 @@
 package com.commerce.kotlin.response
 
-class GetAccountResponse(
+data class GetAccountResponse(
     val email: String,
     val phoneNumber: String
 ) {

@@ -14,7 +14,16 @@ logging:
   level:
     org:
       hibernate:
-#        SQL: DEBUG
+        SQL: DEBUG
         type:
           descriptor:
-            sql: trace
+            sql: "trace"
+server:
+  servlet:
+    session:
+      cookie:
+        name: my-cookie
+        http-only: true
+#        secure: true
+      tracking-modes: cookie
+      timeout: 1800
