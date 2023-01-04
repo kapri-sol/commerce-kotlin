@@ -26,6 +26,11 @@ class Account(
     var customer: Customer? = null
         private set;
 
+    @OneToOne
+    @JoinColumn(name = "")
+    var seller: Seller? = null
+        private set;
+
     var email = email
         private set;
 
@@ -66,5 +71,9 @@ class Account(
         }
 
         this.customer = customer;
+    }
+
+    fun setSeller(seller: Seller) {
+        this.seller = seller;
     }
 }
