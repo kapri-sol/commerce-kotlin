@@ -36,6 +36,7 @@ class ProductService(
     fun updateProduct(productId: Long, updateProductDto: UpdateProductDto) {
         val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException();
         product.changeName(updateProductDto.name);
+        product.changeDescription(updateProductDto.description);
         product.increaseQuantity(updateProductDto.increaseQuantityCount!!);
     }
 
