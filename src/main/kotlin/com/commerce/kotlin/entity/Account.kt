@@ -21,7 +21,7 @@ class Account(
     @GeneratedValue
     val id: Long? = null;
 
-    @OneToOne
+    @OneToOne()
     @JoinColumn(name = "customer_id")
     var customer: Customer? = null
         private set;
@@ -47,21 +47,24 @@ class Account(
         this.deleted = true;
     }
 
-    fun update(phoneNumber: String?, password: String?) {
-        if( phoneNumber !== null) {
-            this.phoneNumber = phoneNumber;
-        }
-
-        if(password !== null) {
-            this.password = password;
-        }
+    fun updatePhoneNumber(phoneNumber: String) {
+        this.phoneNumber = phoneNumber
     }
+
+    fun updatePassword(password: String) {
+        this.password = password
+    }
+
 
     fun authenticate(password: String): Boolean {
         return this.password == password;
     }
 
     fun setCustomer(customer: Customer) {
+        if (this.customer != null) {
+            throw Error();
+        }
+
         this.customer = customer;
     }
 }

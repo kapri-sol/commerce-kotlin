@@ -1,7 +1,9 @@
 package com.commerce.kotlin.service
 
 import com.commerce.kotlin.dto.CreateCustomerDto
+import com.commerce.kotlin.dto.UpdateCustomerDto
 import com.commerce.kotlin.entity.Account
+import com.commerce.kotlin.entity.Customer
 import com.commerce.kotlin.repository.AccountRepository
 import com.commerce.kotlin.repository.CustomerRepository
 import net.datafaker.Faker
@@ -23,15 +25,27 @@ class CustomerServiceTest(
 
     private val faker = Faker()
 
+    fun generateAccount(): Account {
+       val account = Account(
+           email = faker.internet().emailAddress(),
+           phoneNumber = faker.phoneNumber().phoneNumber(),
+           password = faker.internet().password()
+       )
+        return this.accountRepository.save(account)
+    }
+
+    fun generateCustomer(): Customer {
+        val customer = Customer(
+            name = faker.name().fullName(),
+            address = faker.address().fullAddress()
+        )
+        return this.customerRepository.save(customer)
+    }
+
     @Test
     fun createCustomer() {
         // given
-        val createAccount = Account(
-            email = faker.internet().emailAddress(),
-            phoneNumber = faker.phoneNumber().phoneNumber(),
-            password = faker.internet().password()
-        )
-        val account = this.accountRepository.save(createAccount);
+        val account = this.generateAccount()
 
         val createCustomerDto = CreateCustomerDto(
             name = faker.name().fullName(),
@@ -46,4 +60,48 @@ class CustomerServiceTest(
         assertThat(customer?.name).isEqualTo(createCustomerDto.name);
         assertThat(customer?.address).isEqualTo(createCustomerDto.address);
     }
+
+    @Test
+    fun findCustomer() {
+        // given
+        val customer = generateCustomer()
+        // when
+        val findCustomer = this.customerService.findCustomer(customer.id!!)
+        // then
+        assertThat(customer.id).isEqualTo(findCustomer.id)
+        assertThat(customer.name).isEqualTo(findCustomer.name)
+        assertThat(customer.address).isEqualTo(findCustomer.address)
+    }
+
+    @Test
+    fun updateCustomer() {
+        // given
+        val customer = generateCustomer()
+        val updateCustomerDto = UpdateCustomerDto(
+            name = faker.name().fullName(),
+            address = faker.address().fullAddress()
+        )
+
+        // when
+        this.customerService.updateCustomer(customer.id!!, updateCustomerDto);
+        val findCustomer = this.customerRepository.findByIdOrNull(customer.id!!);
+
+        // then
+        assertThat(findCustomer?.id).isEqualTo(customer.id)
+        assertThat(findCustomer?.name).isEqualTo(updateCustomerDto.name)
+        assertThat(findCustomer?.address).isEqualTo(updateCustomerDto.address)
+    }
+
+    @Test
+    fun removeCustomer() {
+        // given
+        val customer = generateCustomer()
+        // when
+        this.customerService.removeCustomer(customer.id!!)
+        val findCustomer = this.customerRepository.findByIdOrNull(customer.id!!)
+        // then
+        assertThat(findCustomer).isNull()
+    }
+
+
 }

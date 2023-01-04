@@ -1,6 +1,7 @@
 package com.commerce.kotlin.service
 
 import com.commerce.kotlin.dto.CreateCustomerDto
+import com.commerce.kotlin.dto.UpdateCustomerDto
 import com.commerce.kotlin.entity.Customer
 import com.commerce.kotlin.repository.AccountRepository
 import com.commerce.kotlin.repository.CustomerRepository
@@ -20,8 +21,23 @@ class CustomerService(
         val customer = Customer(
             name = createCustomerDto.name,
             address = createCustomerDto.address,
-            account
         )
+        account.setCustomer(customer);
         return customerRepository.save(customer).id
+    }
+
+    fun findCustomer(customerId: Long): Customer {
+        return this.customerRepository.findByIdOrNull(customerId) ?: throw NotFoundException()
+    }
+
+    fun updateCustomer(customerId: Long, updateCustomerDto: UpdateCustomerDto) {
+        val customer = this.customerRepository.findByIdOrNull(customerId) ?: throw NotFoundException()
+        customer.updateName(updateCustomerDto.name)
+        customer.updateAddress(updateCustomerDto.address)
+    }
+
+    fun removeCustomer(customerId: Long) {
+        val customer = this.customerRepository.findByIdOrNull(customerId) ?: throw NotFoundException()
+        customer.remove()
     }
 }

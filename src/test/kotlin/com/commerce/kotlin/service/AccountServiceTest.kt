@@ -22,11 +22,6 @@ class AccountServiceTest(
 {
 
     @Test
-    fun clear() {
-        this.accountRepository.deleteAll()
-    }
-
-    @Test
     fun createAccount() {
         // given
         val createAccountDto = CreateAccountDto(
