@@ -17,7 +17,8 @@ class Product(
     description: String,
     price: Double,
     stockQuantity: Int
-) {
+) : BaseEntity()
+{
     @GeneratedValue
     @Id
     val id: Long? = null;
@@ -40,12 +41,6 @@ class Product(
         private set;
 
     private var deleted: Boolean = false;
-
-    @CreatedDate
-    val createdAt: LocalDateTime = LocalDateTime.now();
-
-    @LastModifiedDate
-    val updatedAt: LocalDateTime = LocalDateTime.now();
 
     init {
         if (stockQuantity <= 0) {

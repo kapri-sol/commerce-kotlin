@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 class Seller(
     name: String,
     address: String,
-)
+) : BaseEntity()
 {
     @Id
     @GeneratedValue
@@ -27,11 +27,6 @@ class Seller(
 
     private var deleted: Boolean = false;
 
-    @CreatedDate
-    val createdAt: LocalDateTime = LocalDateTime.now();
-
-    @LastModifiedDate
-    val updatedAt: LocalDateTime = LocalDateTime.now();
 
     fun remove() {
         this.deleted = true;

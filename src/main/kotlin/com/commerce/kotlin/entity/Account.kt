@@ -1,10 +1,6 @@
 package com.commerce.kotlin.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.*
 import org.hibernate.annotations.Where
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -16,18 +12,19 @@ class Account(
     email: String,
     phoneNumber: String,
     password: String,
-) {
+): BaseEntity()
+{
     @Id
     @GeneratedValue
     val id: Long? = null;
 
-    @OneToOne()
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     var customer: Customer? = null
         private set;
 
-    @OneToOne
-    @JoinColumn(name = "")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
     var seller: Seller? = null
         private set;
 
@@ -41,12 +38,6 @@ class Account(
         private set;
 
     private var deleted: Boolean? = false;
-
-    @CreatedDate
-    val createdAt: LocalDateTime = LocalDateTime.now();
-
-    @LastModifiedDate
-    val updateAt: LocalDateTime = LocalDateTime.now();
 
     fun remove() {
         this.deleted = true;
