@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.order
 
-import com.commerce.kotlin.domain.BaseEntity
+import com.commerce.kotlin.common.entity.BaseEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

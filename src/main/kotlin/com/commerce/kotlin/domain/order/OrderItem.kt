@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.order
 
-import com.commerce.kotlin.domain.BaseEntity
+import com.commerce.kotlin.common.entity.BaseEntity
 import com.commerce.kotlin.domain.order.OrderItemStatus.*
 import com.commerce.kotlin.domain.product.Product
 import jakarta.persistence.*

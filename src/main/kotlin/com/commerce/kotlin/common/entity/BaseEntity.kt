@@ -1,4 +1,4 @@
-package com.commerce.kotlin.domain
+package com.commerce.kotlin.common.entity
 
 import jakarta.persistence.MappedSuperclass
 import org.springframework.data.annotation.CreatedDate

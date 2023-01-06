@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.product
 
-import com.commerce.kotlin.domain.BaseEntity
+import com.commerce.kotlin.common.entity.BaseEntity
 import com.commerce.kotlin.domain.seller.Seller
 import jakarta.persistence.*
 import jakarta.persistence.FetchType.LAZY

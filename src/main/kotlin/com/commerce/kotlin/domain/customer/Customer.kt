@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.customer
 
-import com.commerce.kotlin.domain.BaseEntity
+import com.commerce.kotlin.common.entity.BaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
