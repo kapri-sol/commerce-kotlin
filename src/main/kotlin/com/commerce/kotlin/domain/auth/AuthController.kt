@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.auth
 
-import com.commerce.kotlin.constant.SESSION_NAME
+import com.commerce.kotlin.common.constant.SESSION_NAME
 import com.commerce.kotlin.domain.auth.dto.LoginDto
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus

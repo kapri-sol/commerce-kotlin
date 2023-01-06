@@ -1,4 +1,4 @@
-package com.commerce.kotlin.interceptor
+package com.commerce.kotlin.common.interceptor
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
