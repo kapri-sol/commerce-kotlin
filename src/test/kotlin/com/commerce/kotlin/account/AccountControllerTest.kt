@@ -32,7 +32,7 @@ class AccountControllerTest(
 
     @AfterEach
     fun deleteAll() {
-        this.accountRepository.deleteAll();
+        this.accountRepository.deleteAll()
     }
 
     @Test
@@ -42,9 +42,9 @@ class AccountControllerTest(
             email = this.faker.internet().emailAddress(),
             phoneNumber = this.faker.phoneNumber().phoneNumber(),
             password = this.faker.internet().password()
-        );
+        )
 
-        val createAccountResponse = PostAccountResponse(id = 1L);
+        val createAccountResponse = PostAccountResponse(id = 1L)
 
         this.mockMvc.perform(
             post("/accounts")
@@ -52,7 +52,7 @@ class AccountControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isCreated)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(createAccountResponse)));
+            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(createAccountResponse)))
 
     }
 
@@ -63,15 +63,15 @@ class AccountControllerTest(
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = faker.internet().password()
         )
-        val account = this.accountRepository.save(createAccount);
+        val account = this.accountRepository.save(createAccount)
 
         val getAccountResponse = GetAccountResponse(
             email = createAccount.email,
             phoneNumber = createAccount.phoneNumber
-        );
+        )
 
         this.mockMvc.perform(get("/accounts/${account.id}"))
             .andExpect(status().isOk)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getAccountResponse)));
+            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getAccountResponse)))
     }
 }

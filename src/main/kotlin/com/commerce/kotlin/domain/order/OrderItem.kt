@@ -15,21 +15,21 @@ class OrderItem(
 {
     @GeneratedValue
     @Id
-    val id: Long? = null;
+    val id: Long? = null
 
-    private var status: OrderItemStatus = PENDING;
+    private var status: OrderItemStatus = PENDING
 
     @ManyToOne
     @JoinColumn(name = "order_id")
     var order: Order? = null
-        private set;
+        private set
 
     fun order() {
-        this.product.order(this.count);
+        this.product.order(this.count)
     }
 
     fun setOrder(order: Order) {
-            this.order = order;
+            this.order = order
     }
 
     fun cancel() {

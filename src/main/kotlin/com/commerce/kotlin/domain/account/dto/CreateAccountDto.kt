@@ -11,6 +11,4 @@ data class CreateAccountDto(
 
     @NotBlank
     var password: String
-) {
-
-}
+)

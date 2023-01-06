@@ -5,5 +5,4 @@ data class CreateProductDto(
     val description: String,
     val price: Double,
     val stockQuantity: Int
-) {
-}
+)

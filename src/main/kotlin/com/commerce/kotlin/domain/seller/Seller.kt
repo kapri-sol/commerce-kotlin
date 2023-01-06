@@ -15,19 +15,19 @@ class Seller(
 {
     @Id
     @GeneratedValue
-    val id: Long? = null;
+    val id: Long? = null
 
     var name: String? = name
-        private set;
+        private set
 
     var address: String? = address
-        private set;
+        private set
 
-    private var deleted: Boolean = false;
+    private var deleted: Boolean = false
 
 
     fun remove() {
-        this.deleted = true;
+        this.deleted = true
     }
 
     fun updateName(name: String) {

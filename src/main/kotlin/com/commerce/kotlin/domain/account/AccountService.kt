@@ -16,19 +16,19 @@ class AccountService (
         val account = this.accountRepository.findByEmail(email)
 
         if (account !== null) {
-            throw IllegalStateException();
+            throw IllegalStateException()
         }
     }
 
     fun createAccount(createAccountDto: CreateAccountDto): Long {
-        validateEmailDuplicated(createAccountDto.email);
+        validateEmailDuplicated(createAccountDto.email)
 
         val createAccount = Account(
             email = createAccountDto.email,
             phoneNumber = createAccountDto.phoneNumber,
             password = createAccountDto.password
         )
-        return this.accountRepository.save(createAccount).id ?: throw InternalError();
+        return this.accountRepository.save(createAccount).id ?: throw InternalError()
     }
 
     fun findAccount(accountId: Long): Account {
@@ -43,6 +43,6 @@ class AccountService (
 
     fun removeAccount(accountId: Long) {
         val account = this.accountRepository.findByIdOrNull(accountId) ?: throw NotFoundException()
-        account.remove();
+        account.remove()
     }
 }

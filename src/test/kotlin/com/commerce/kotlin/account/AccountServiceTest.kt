@@ -45,7 +45,7 @@ class AccountServiceTest(
     }
 
     @DisplayName("중복된 이메일로 계정을 생성하면 IllegalStateException 예외가 발생한다.")
-    @Test()
+    @Test
     fun createAccountDuplicatedEmail() {
         // given
         val account = Account(

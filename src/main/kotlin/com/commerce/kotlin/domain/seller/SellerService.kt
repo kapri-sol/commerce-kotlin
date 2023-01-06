@@ -15,12 +15,12 @@ class SellerService(
     private val sellerRepository: SellerRepository
 ) {
     fun createSeller(accountId: Long, createSellerDto: CreateSellerDto): Long? {
-        val account = accountRepository.findByIdOrNull(accountId) ?: throw ChangeSetPersister.NotFoundException();
+        val account = accountRepository.findByIdOrNull(accountId) ?: throw ChangeSetPersister.NotFoundException()
         val seller = Seller(
             name = createSellerDto.name,
             address = createSellerDto.address,
         )
-        account.setSeller(seller);
+        account.setSeller(seller)
         return this.sellerRepository.save(seller).id
     }
 

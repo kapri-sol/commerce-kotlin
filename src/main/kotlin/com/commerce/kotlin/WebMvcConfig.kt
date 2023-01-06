@@ -11,6 +11,6 @@ class WebMvcConfig: WebMvcConfigurer {
         registry.addInterceptor(AuthInterceptor())
             .order(1)
             .addPathPatterns("/**")
-            .excludePathPatterns("/accounts");
+            .excludePathPatterns("/accounts")
     }
 }

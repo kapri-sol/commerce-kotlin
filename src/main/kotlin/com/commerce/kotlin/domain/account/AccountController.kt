@@ -20,17 +20,17 @@ class AccountController(
 
     @GetMapping("{id}")
     fun getAccount(@PathVariable("id") accountId: Long): GetAccountResponse {
-        val account = accountService.findAccount(accountId);
+        val account = accountService.findAccount(accountId)
         return GetAccountResponse(
             email = account.email,
             phoneNumber = account.phoneNumber
-        );
+        )
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun postAccount(@RequestBody createAccountDto: CreateAccountDto): PostAccountResponse {
-        val accountId = this.accountService.createAccount(createAccountDto);
-        return PostAccountResponse(id = accountId);
+        val accountId = this.accountService.createAccount(createAccountDto)
+        return PostAccountResponse(id = accountId)
     }
 }

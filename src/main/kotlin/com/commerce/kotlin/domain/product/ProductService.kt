@@ -16,14 +16,14 @@ class ProductService(
 ) {
 
     fun createProduct(sellerId: Long, createProductDto: CreateProductDto): Long {
-        val seller = this.sellerRepository.findByIdOrNull(sellerId) ?: throw NotFoundException();
+        val seller = this.sellerRepository.findByIdOrNull(sellerId) ?: throw NotFoundException()
         val product = Product(
             name = createProductDto.name,
             description = createProductDto.description,
             price = createProductDto.price,
             stockQuantity = createProductDto.stockQuantity
         )
-        product.setSeller(seller);
+        product.setSeller(seller)
         return this.productRepository.save(product).id!!
     }
 
@@ -32,14 +32,14 @@ class ProductService(
     }
 
     fun updateProduct(productId: Long, updateProductDto: UpdateProductDto) {
-        val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException();
-        product.changeName(updateProductDto.name);
-        product.changeDescription(updateProductDto.description);
-        product.increaseQuantity(updateProductDto.increaseQuantityCount!!);
+        val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
+        product.changeName(updateProductDto.name)
+        product.changeDescription(updateProductDto.description)
+        product.increaseQuantity(updateProductDto.increaseQuantityCount!!)
     }
 
     fun removeProduct(productId: Long) {
-        val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException();
-        product.remove();
+        val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
+        product.remove()
     }
 }

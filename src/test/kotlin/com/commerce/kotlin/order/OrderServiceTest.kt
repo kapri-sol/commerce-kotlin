@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 
 @SpringBootTest
 class OrderServiceTest(
@@ -19,7 +18,7 @@ class OrderServiceTest(
     @Autowired val orderRepository: OrderRepository,
     @Autowired val orderService: OrderService
 ) {
-    val faker = Faker();
+    val faker = Faker()
 
     fun generateProduct(): Product {
         val product = Product(
@@ -28,17 +27,17 @@ class OrderServiceTest(
             price = faker.commerce().price().toDouble(),
             stockQuantity = faker.random().nextInt(1, 100)
         )
-        return this.productRepository.save(product);
+        return this.productRepository.save(product)
     }
 
     fun generateProducts(count: Int): List<Product> {
-        return List(count){generateProduct()};
+        return List(count){generateProduct()}
     }
 
     @Test
     fun createOrder() {
         // given
-        val products = generateProducts(3);
+        val products = generateProducts(3)
         val createOrderItemsDto = products.map { CreateOrderItemDto(
             productId = it.id!!,
             count = 3
@@ -46,9 +45,9 @@ class OrderServiceTest(
         val createOrderDto = CreateOrderDto(orderItems = createOrderItemsDto)
 
         // when
-        val orderId = this.orderService.order(createOrderDto);
+        val orderId = this.orderService.order(createOrderDto)
 
-        val findOrder = this.orderRepository.findByIdWithOrderItem(orderId);
+        val findOrder = this.orderRepository.findByIdWithOrderItem(orderId)
 
 //        findOrder?.orderItems?.forEach {
 //            println(it);

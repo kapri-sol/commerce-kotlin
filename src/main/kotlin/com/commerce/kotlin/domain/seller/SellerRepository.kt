@@ -1,6 +1,5 @@
-package com.commerce.kotlin.domain.seller;
+package com.commerce.kotlin.domain.seller
 
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface SellerRepository : JpaRepository<Seller, Long> {
-}
+interface SellerRepository : JpaRepository<Seller, Long>

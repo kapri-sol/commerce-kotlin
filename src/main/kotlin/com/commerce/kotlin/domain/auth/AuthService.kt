@@ -10,7 +10,7 @@ class AuthService(
     private val accountRepository: AccountRepository
 ) {
     fun authenticate(email: String, password: String): Long? {
-        val account = this.accountRepository.findByEmail(email) ?: return null;
+        val account = this.accountRepository.findByEmail(email) ?: return null
         return account.id
     }
 }

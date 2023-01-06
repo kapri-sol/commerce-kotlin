@@ -53,12 +53,12 @@ class CustomerServiceTest(
         )
 
         //when
-        val customerId = this.customerService.createCustomer(account.id!!, createCustomerDto);
-        val customer = this.customerRepository.findByIdOrNull(customerId);
+        val customerId = this.customerService.createCustomer(account.id!!, createCustomerDto)
+        val customer = this.customerRepository.findByIdOrNull(customerId)
 
-        assertThat(customer?.id).isEqualTo(customerId);
-        assertThat(customer?.name).isEqualTo(createCustomerDto.name);
-        assertThat(customer?.address).isEqualTo(createCustomerDto.address);
+        assertThat(customer?.id).isEqualTo(customerId)
+        assertThat(customer?.name).isEqualTo(createCustomerDto.name)
+        assertThat(customer?.address).isEqualTo(createCustomerDto.address)
     }
 
     @Test
@@ -83,8 +83,8 @@ class CustomerServiceTest(
         )
 
         // when
-        this.customerService.updateCustomer(customer.id!!, updateCustomerDto);
-        val findCustomer = this.customerRepository.findByIdOrNull(customer.id!!);
+        this.customerService.updateCustomer(customer.id!!, updateCustomerDto)
+        val findCustomer = this.customerRepository.findByIdOrNull(customer.id!!)
 
         // then
         assertThat(findCustomer?.id).isEqualTo(customer.id)

@@ -3,17 +3,15 @@ package com.commerce.kotlin.interceptor
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.servlet.HandlerInterceptor
-import org.springframework.web.servlet.ModelAndView
-import java.lang.Exception
 
 class AuthInterceptor : HandlerInterceptor  {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val session = request.getSession(false);
+        val session = request.getSession(false)
 
         if (session === null) {
-            return false;
+            return false
         }
 
-        return true;
+        return true
     }
 }

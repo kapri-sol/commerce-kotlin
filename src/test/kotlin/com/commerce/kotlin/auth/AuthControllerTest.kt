@@ -24,23 +24,23 @@ class AuthControllerTest(
     private val accountRepository: AccountRepository
 ) {
 
-    private val faker = Faker();
+    private val faker = Faker()
 
     @Test
     fun login() {
         // given
-        val email = faker.internet().emailAddress();
-        val password = faker.internet().password();
+        val email = faker.internet().emailAddress()
+        val password = faker.internet().password()
         val createAccount = Account(
             email = email,
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = password,
-        );
-        val account = accountRepository.save(createAccount);
+        )
+        val account = accountRepository.save(createAccount)
         val loginDto = LoginDto(
             email = email,
             password = password
-        );
+        )
 
         //when
         this.mockMvc.perform(

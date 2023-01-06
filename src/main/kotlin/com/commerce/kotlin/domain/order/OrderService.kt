@@ -12,17 +12,17 @@ class OrderService(
     val productRepository: ProductRepository
 ) {
     fun order(createOrderDto: CreateOrderDto): Long {
-        val orderItemsDto = createOrderDto.orderItems;
-        val products = productRepository.findAllById(orderItemsDto.map { it.productId }).associateBy { it.id };
+        val orderItemsDto = createOrderDto.orderItems
+        val products = productRepository.findAllById(orderItemsDto.map { it.productId }).associateBy { it.id }
 
         val orderItems = orderItemsDto.map { OrderItem(
             product = products.getValue(it.productId),
             count = it.count
         )  }
 
-        val order = Order(orderItems);
+        val order = Order(orderItems)
 
-        return orderRepository.save(order).id!!;
+        return orderRepository.save(order).id!!
     }
 
     fun findOrder() {

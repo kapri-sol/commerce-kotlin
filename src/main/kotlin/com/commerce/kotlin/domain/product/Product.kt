@@ -17,30 +17,30 @@ class Product(
 {
     @GeneratedValue
     @Id
-    val id: Long? = null;
+    val id: Long? = null
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn
     var seller: Seller? = null
-        private set;
+        private set
 
     var name: String = name
-        private set;
+        private set
 
     var description: String = description
-        private set;
+        private set
 
     var price: Double = price
-        private set;
+        private set
 
     var stockQuantity: Int = stockQuantity
-        private set;
+        private set
 
-    private var deleted: Boolean = false;
+    private var deleted: Boolean = false
 
     init {
         if (stockQuantity <= 0) {
-            throw Error();
+            throw Error()
         }
     }
 
@@ -48,11 +48,11 @@ class Product(
         if (this.seller != null) {
             throw Error()
         }
-        this.seller = seller;
+        this.seller = seller
     }
 
     fun remove() {
-        this.deleted = true;
+        this.deleted = true
     }
 
     fun changeName(name: String) {
@@ -60,20 +60,20 @@ class Product(
     }
 
     fun changeDescription(description: String) {
-        this.description = description;
+        this.description = description
     }
 
     fun increaseQuantity(increaseCount: Int) {
         if (increaseCount <= 0) {
-           throw Error();
+           throw Error()
         }
         this.stockQuantity += increaseCount
     }
 
     fun order(orderCount: Int) {
         if (this.stockQuantity < orderCount) {
-           throw Error();
+           throw Error()
         }
-        this.stockQuantity -= orderCount;
+        this.stockQuantity -= orderCount
     }
 }

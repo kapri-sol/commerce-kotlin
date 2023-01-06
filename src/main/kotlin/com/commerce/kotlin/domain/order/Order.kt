@@ -17,12 +17,12 @@ class Order(
 {
     @GeneratedValue
     @Id
-    val id: Long? = null;
+    val id: Long? = null
 
     init {
         orderItems.forEach{
-            it.setOrder(this);
-            it.order();
+            it.setOrder(this)
+            it.order()
         }
     }
 }

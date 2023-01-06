@@ -17,32 +17,32 @@ class Account(
 {
     @Id
     @GeneratedValue
-    val id: Long? = null;
+    val id: Long? = null
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id")
     var customer: Customer? = null
-        private set;
+        private set
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "seller_id")
     var seller: Seller? = null
-        private set;
+        private set
 
     @Column(unique = true)
     var email = email
-        private set;
+        private set
 
     var phoneNumber = phoneNumber
-        private set;
+        private set
 
     var password = password
-        private set;
+        private set
 
-    private var deleted: Boolean? = false;
+    private var deleted: Boolean? = false
 
     fun remove() {
-        this.deleted = true;
+        this.deleted = true
     }
 
     fun updatePhoneNumber(phoneNumber: String) {
@@ -55,18 +55,18 @@ class Account(
 
 
     fun authenticate(password: String): Boolean {
-        return this.password == password;
+        return this.password == password
     }
 
     fun setCustomer(customer: Customer) {
         if (this.customer != null) {
-            throw Error();
+            throw Error()
         }
 
-        this.customer = customer;
+        this.customer = customer
     }
 
     fun setSeller(seller: Seller) {
-        this.seller = seller;
+        this.seller = seller
     }
 }
