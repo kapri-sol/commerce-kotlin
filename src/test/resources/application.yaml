@@ -17,12 +17,9 @@ spring:
         highlight_sql: true
 logging:
   level:
-    org:
-      hibernate:
-#        SQL: DEBUG
-        type:
-          descriptor:
-            sql: trace
+#    org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
+
 server:
   servlet:
     session:
