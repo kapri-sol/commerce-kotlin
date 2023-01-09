@@ -5,6 +5,7 @@ import com.commerce.kotlin.domain.seller.Seller
 import jakarta.persistence.*
 import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.Where
+import javax.naming.InsufficientResourcesException
 
 @Where(clause = "deleted IS FALSE")
 @Entity
@@ -72,7 +73,9 @@ class Product(
 
     fun order(orderCount: Int) {
         if (this.stockQuantity < orderCount) {
-           throw Error()
+            println(this.stockQuantity)
+            println(orderCount)
+           throw IllegalStateException("Stock Quantity is Inefficient")
         }
         this.stockQuantity -= orderCount
     }
