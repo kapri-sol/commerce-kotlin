@@ -20,8 +20,17 @@ class AccountService (
         }
     }
 
+    private fun validatePhoneNumberDuplicated(phoneNumber: String) {
+        val account = this.accountRepository.findByPhoneNumber(phoneNumber);
+
+        if (account !== null) {
+            throw IllegalStateException()
+        }
+    }
+
     fun createAccount(createAccountDto: CreateAccountDto): Long {
         validateEmailDuplicated(createAccountDto.email)
+        validatePhoneNumberDuplicated(createAccountDto.phoneNumber)
 
         val createAccount = Account(
             email = createAccountDto.email,

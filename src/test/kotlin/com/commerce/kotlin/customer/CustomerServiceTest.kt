@@ -9,6 +9,7 @@ import com.commerce.kotlin.domain.customer.CustomerService
 import com.commerce.kotlin.domain.customer.CustomerRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,6 +43,7 @@ class CustomerServiceTest(
         return this.customerRepository.save(customer)
     }
 
+    @DisplayName("고객을 생성한다.")
     @Test
     fun createCustomer() {
         // given
@@ -56,6 +58,7 @@ class CustomerServiceTest(
         val customerId = this.customerService.createCustomer(account.id!!, createCustomerDto)
         val customer = this.customerRepository.findByIdOrNull(customerId)
 
+        // then
         assertThat(customer?.id).isEqualTo(customerId)
         assertThat(customer?.name).isEqualTo(createCustomerDto.name)
         assertThat(customer?.address).isEqualTo(createCustomerDto.address)

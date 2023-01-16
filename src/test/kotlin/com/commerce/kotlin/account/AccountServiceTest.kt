@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import kotlin.IllegalStateException
 
@@ -22,7 +23,6 @@ class AccountServiceTest(
     @Autowired
     private val accountService: AccountService
 ) {
-
     val faker = Faker()
 
     @DisplayName("계정을 생성한다.")
@@ -46,7 +46,7 @@ class AccountServiceTest(
 
     @DisplayName("중복된 이메일로 계정을 생성하면 IllegalStateException 예외가 발생한다.")
     @Test
-    fun createAccountDuplicatedEmail() {
+    fun createAccountByDuplicatedEmail() {
         // given
         val account = Account(
             email = faker.internet().emailAddress(),
@@ -56,9 +56,35 @@ class AccountServiceTest(
         this.accountRepository.save(account)
 
         val createAccountDto = CreateAccountDto(
-            account.email,
-            phoneNumber = "010-1111-2222",
-            password = "1111"
+            email = account.email,
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
+        )
+
+        // when
+        val createAccount = {
+            this.accountService.createAccount(createAccountDto)
+        }
+
+        // then
+        assertThrows<IllegalStateException> { createAccount() }
+    }
+
+    @DisplayName("중복된 전화번호로 계정을 생성하면 IllegalStateException 예외가 발생한다.")
+    @Test
+    fun createAccountByDuplicatedPhoneNumber() {
+        // given
+        val account = Account(
+            email = faker.internet().emailAddress(),
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
+        )
+        this.accountRepository.save(account)
+
+        val createAccountDto = CreateAccountDto(
+            email = faker.internet().emailAddress(),
+            phoneNumber = account.phoneNumber,
+            password = faker.internet().password()
         )
 
         // when
@@ -88,6 +114,19 @@ class AccountServiceTest(
         assertThat(findAccount.phoneNumber).isEqualTo(account.phoneNumber)
     }
 
+    @DisplayName("없는 계정을 검색하면 NotFoundException 예외가 발생한다.")
+    @Test
+    fun findNullAccount() {
+        // given
+        val accountId = 1000L;
+
+        // when
+        val findAccount = { this.accountService.findAccount(accountId) }
+
+        // then
+        assertThrows<NotFoundException> { findAccount() }
+    }
+
     @DisplayName("계정을 수정한다.")
     @Test
     fun updateAccount() {
@@ -114,6 +153,23 @@ class AccountServiceTest(
         assertThat(updateAccount?.phoneNumber).isEqualTo(updateAccountDto.phoneNumber)
     }
 
+    @DisplayName("없는 계정을 수정하면 NotFoundException 예외가 발생한다.")
+    @Test
+    fun updateNullAccount() {
+        // given
+        val accountId = 1000L;
+        val updateAccountDto = UpdateAccountDto(
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
+        )
+
+        // when
+        val updateAccount = { accountService.updateAccount(accountId, updateAccountDto) }
+
+        // then
+        assertThrows<NotFoundException> { updateAccount() }
+    }
+
     @DisplayName("계정을 삭제한다.")
     @Test
     fun removeAccount() {
@@ -130,5 +186,18 @@ class AccountServiceTest(
         val removeAccount = this.accountRepository.findByIdOrNull(account.id)
         // then
         assertThat(removeAccount).isNull()
+    }
+
+    @DisplayName("없는 계정을 삭제한면 NotFoundException 예외가 발생한다.")
+    @Test
+    fun removeNullAccount() {
+        // given
+        val accountId = 1000L
+
+        // when
+        val removeAccount = { accountService.removeAccount(accountId) }
+
+        // then
+        assertThrows<NotFoundException>(removeAccount)
     }
 }
