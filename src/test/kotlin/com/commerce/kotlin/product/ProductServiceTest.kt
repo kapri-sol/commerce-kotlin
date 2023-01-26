@@ -9,6 +9,7 @@ import com.commerce.kotlin.domain.product.ProductRepository
 import com.commerce.kotlin.domain.seller.SellerRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,6 +43,7 @@ class ProductServiceTest(
     }
 
     @Test
+    @DisplayName("상품을 생성한다.")
     fun createProduct() {
         // given
         val seller = generateSeller()
@@ -64,6 +66,7 @@ class ProductServiceTest(
     }
 
     @Test
+    @DisplayName("상품을 검색한다.")
     fun findProduct() {
         // given
         val product = this.generateProduct()
@@ -78,6 +81,7 @@ class ProductServiceTest(
     }
 
     @Test
+    @DisplayName("상품 정보를 수정한다.")
     fun updateProduct() {
         // given
         val product = generateProduct()
@@ -100,6 +104,7 @@ class ProductServiceTest(
     }
 
     @Test
+    @DisplayName("상품을 제거한다.")
     fun removeProduct() {
         // given
         val product = generateProduct()

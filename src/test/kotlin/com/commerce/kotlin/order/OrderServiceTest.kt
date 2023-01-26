@@ -8,6 +8,7 @@ import com.commerce.kotlin.domain.order.dto.CreateOrderItemDto
 import com.commerce.kotlin.domain.product.ProductRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +37,8 @@ class OrderServiceTest(
     }
 
     @Test
-    fun createOrder() {
+    @DisplayName("주문한다.")
+    fun order() {
         // given
         val products = generateProducts(faker.random().nextInt(1, 9))
         val createOrderItemsDto = products.map {
@@ -55,9 +57,5 @@ class OrderServiceTest(
 
         assertThat(findOrder?.id).isEqualTo(orderId)
 //        assertThat(findOrder?.orderItems?.size).isEqualTo(products.size)
-    }
-
-    @Test
-    fun findOrder() {
     }
 }

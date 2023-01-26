@@ -9,7 +9,6 @@ import com.commerce.kotlin.domain.account.dto.PostAccountResponse
 import com.commerce.kotlin.domain.auth.dto.LoginDto
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import net.datafaker.Faker
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -18,12 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.web.reactive.function.client.*
 
 
 @AutoConfigureMockMvc
