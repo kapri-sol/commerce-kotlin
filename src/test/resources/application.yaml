@@ -1,10 +1,5 @@
 
 spring:
-  datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
   output:
     ansi:
       enable: always
@@ -25,7 +20,7 @@ server:
     session:
       cookie:
         name: my-cookie
-        http-only: true
+#        http-only: true
 #        secure: true
       tracking-modes: cookie
       timeout: 1800

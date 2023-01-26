@@ -27,11 +27,11 @@ class CustomerServiceTest(
     private val faker = Faker()
 
     fun generateAccount(): Account {
-       val account = Account(
-           email = faker.internet().emailAddress(),
-           phoneNumber = faker.phoneNumber().phoneNumber(),
-           password = faker.internet().password()
-       )
+        val account = Account(
+            email = faker.internet().emailAddress(),
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
+        )
         return this.accountRepository.save(account)
     }
 
@@ -65,11 +65,12 @@ class CustomerServiceTest(
     }
 
     @Test
+    @DisplayName("고객을 검색한다.")
     fun findCustomer() {
         // given
         val customer = generateCustomer()
         // when
-        val findCustomer = this.customerService.findCustomer(customer.id!!)
+        val findCustomer = this.customerService.findCustomerById(customer.id!!)
         // then
         assertThat(customer.id).isEqualTo(findCustomer.id)
         assertThat(customer.name).isEqualTo(findCustomer.name)
@@ -77,6 +78,7 @@ class CustomerServiceTest(
     }
 
     @Test
+    @DisplayName("고객 정보를 수정한다.")
     fun updateCustomer() {
         // given
         val customer = generateCustomer()
@@ -96,6 +98,7 @@ class CustomerServiceTest(
     }
 
     @Test
+    @DisplayName("고객을 제거한다.")
     fun removeCustomer() {
         // given
         val customer = generateCustomer()

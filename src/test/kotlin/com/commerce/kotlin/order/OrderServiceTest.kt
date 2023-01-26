@@ -39,10 +39,12 @@ class OrderServiceTest(
     fun createOrder() {
         // given
         val products = generateProducts(faker.random().nextInt(1, 9))
-        val createOrderItemsDto = products.map { CreateOrderItemDto(
-            productId = it.id!!,
-            count = 3
-        ) }
+        val createOrderItemsDto = products.map {
+            CreateOrderItemDto(
+                productId = it.id!!,
+                count = 3
+            )
+        }
         val createOrderDto = CreateOrderDto(orderItems = createOrderItemsDto)
 
         // when

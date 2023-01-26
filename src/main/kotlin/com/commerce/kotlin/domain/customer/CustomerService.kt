@@ -24,9 +24,10 @@ class CustomerService(
         return customerRepository.save(customer).id
     }
 
-    fun findCustomer(customerId: Long): Customer {
+    fun findCustomerById(customerId: Long): Customer {
         return this.customerRepository.findByIdOrNull(customerId) ?: throw NotFoundException()
     }
+
 
     fun updateCustomer(customerId: Long, updateCustomerDto: UpdateCustomerDto) {
         val customer = this.customerRepository.findByIdOrNull(customerId) ?: throw NotFoundException()

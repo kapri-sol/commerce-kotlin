@@ -28,7 +28,7 @@ server:
     session:
       cookie:
         name: my-cookie
-        http-only: true
+#        http-only: true
 #        secure: true
       tracking-modes: cookie
       timeout: 1800

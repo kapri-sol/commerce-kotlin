@@ -19,7 +19,7 @@ class AuthController(
     @PostMapping("login")
     fun login(@RequestBody loginDto: LoginDto, httpServletRequest: HttpServletRequest) {
         val accountId = this.authService.authenticate(
-            email = loginDto.email, 
+            email = loginDto.email,
             password = loginDto.password
         ) ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
 
