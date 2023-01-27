@@ -78,6 +78,7 @@ class AccountControllerTest(
         )
 
         val sessionAttr = HashMap<String, Any>()
+        sessionAttr[SESSION_NAME]
         account.id?.let { sessionAttr.put(SESSION_NAME, it) }
 
         this.mockMvc.perform(get("/accounts/me").sessionAttrs(sessionAttr))

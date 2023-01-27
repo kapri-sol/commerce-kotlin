@@ -14,14 +14,14 @@ class SellerService(
     private val accountRepository: AccountRepository,
     private val sellerRepository: SellerRepository
 ) {
-    fun createSeller(accountId: Long, createSellerDto: CreateSellerDto): Long? {
+    fun createSeller(accountId: Long, createSellerDto: CreateSellerDto): Long {
         val account = accountRepository.findByIdOrNull(accountId) ?: throw ChangeSetPersister.NotFoundException()
         val seller = Seller(
             name = createSellerDto.name,
             address = createSellerDto.address,
         )
         account.setSeller(seller)
-        return this.sellerRepository.save(seller).id
+        return this.sellerRepository.save(seller).id ?: throw IllegalStateException()
     }
 
     fun findSeller(sellerId: Long): Seller {
