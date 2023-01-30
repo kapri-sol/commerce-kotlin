@@ -69,7 +69,7 @@ class SellerServiceTest(
         // given
         val seller = generateSeller()
         // when
-        val findSeller = this.sellerService.findSeller(seller.id!!)
+        val findSeller = this.sellerService.findSellerById(seller.id!!)
         // then
         assertThat(seller.id).isEqualTo(findSeller.id)
         assertThat(seller.name).isEqualTo(findSeller.name)

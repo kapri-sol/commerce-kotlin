@@ -12,7 +12,7 @@ import javax.naming.InsufficientResourcesException
 class Product(
     name: String,
     description: String,
-    price: Double,
+    price: Int,
     stockQuantity: Int
 ) : BaseEntity()
 {
@@ -31,7 +31,7 @@ class Product(
     var description: String = description
         private set
 
-    var price: Double = price
+    var price: Int = price
         private set
 
     var stockQuantity: Int = stockQuantity

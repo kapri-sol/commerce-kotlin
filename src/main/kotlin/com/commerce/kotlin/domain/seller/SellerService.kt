@@ -24,7 +24,7 @@ class SellerService(
         return this.sellerRepository.save(seller).id ?: throw IllegalStateException()
     }
 
-    fun findSeller(sellerId: Long): Seller {
+    fun findSellerById(sellerId: Long): Seller {
         return this.sellerRepository.findByIdOrNull(sellerId) ?: throw ChangeSetPersister.NotFoundException()
     }
 

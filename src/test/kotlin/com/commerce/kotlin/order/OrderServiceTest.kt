@@ -26,7 +26,7 @@ class OrderServiceTest(
         val product = Product(
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
-            price = faker.commerce().price().toDouble(),
+            price = faker.commerce().price().toInt(),
             stockQuantity = faker.random().nextInt(11, 100)
         )
         return this.productRepository.save(product)

@@ -27,12 +27,17 @@ class ProductService(
         return this.productRepository.save(product).id!!
     }
 
-    fun findProduct(productId: Long): Product {
+    fun findProductById(productId: Long): Product {
         return this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
     }
 
-    fun updateProduct(productId: Long, updateProductDto: UpdateProductDto) {
-        val product = this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
+    fun updateProduct(productId: Long, sellerId: Long, updateProductDto: UpdateProductDto) {
+        val product = this.productRepository.findByIdWithSeller(productId) ?: throw NotFoundException()
+
+        if (product.seller?.id != sellerId) {
+            throw IllegalAccessException()
+        }
+
         product.changeName(updateProductDto.name)
         product.changeDescription(updateProductDto.description)
         product.increaseQuantity(updateProductDto.increaseQuantityCount!!)

@@ -36,7 +36,7 @@ class ProductServiceTest(
         val product = Product(
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
-            price = faker.commerce().price().toDouble(),
+            price = faker.commerce().price().toDouble().toInt(),
             stockQuantity = faker.random().nextInt(1, 1000)
         )
         return this.productRepository.save(product)
@@ -50,7 +50,7 @@ class ProductServiceTest(
         val createProductDto = CreateProductDto(
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
-            price = faker.commerce().price().toDouble(),
+            price = faker.commerce().price().toDouble().toInt(),
             stockQuantity = faker.random().nextInt(1, 1000)
         )
         // when
@@ -71,7 +71,7 @@ class ProductServiceTest(
         // given
         val product = this.generateProduct()
         //when
-        val findProduct = this.productService.findProduct(product.id!!)
+        val findProduct = this.productService.findProductById(product.id!!)
         //then
         assertThat(product.id).isEqualTo(findProduct.id)
         assertThat(product.name).isEqualTo(findProduct.name)
@@ -81,21 +81,28 @@ class ProductServiceTest(
     }
 
     @Test
-    @DisplayName("상품 정보를 수정한다.")
+    @DisplayName("상품의 판매자가 상품 정보를 수정한다.")
     fun updateProduct() {
         // given
+        val seller = generateSeller()
         val product = generateProduct()
+        product.setSeller(seller)
+        productRepository.saveAndFlush(product)
+
         val updateProductDto = UpdateProductDto(
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
             increaseQuantityCount = faker.random().nextInt(1, 10)
         )
+
         // when
         productService.updateProduct(
             productId = product.id!!,
+            sellerId = seller.id!!,
             updateProductDto = updateProductDto
         )
         val updateProduct = this.productRepository.findByIdOrNull(product.id)
+
         // then
         assertThat(updateProduct?.id).isEqualTo(product.id)
         assertThat(updateProduct?.name).isEqualTo(updateProductDto.name)

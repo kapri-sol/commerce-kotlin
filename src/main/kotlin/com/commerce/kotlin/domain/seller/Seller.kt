@@ -17,10 +17,10 @@ class Seller(
     @GeneratedValue
     val id: Long? = null
 
-    var name: String? = name
+    var name: String = name
         private set
 
-    var address: String? = address
+    var address: String = address
         private set
 
     private var deleted: Boolean = false

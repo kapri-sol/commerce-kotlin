@@ -3,11 +3,15 @@ package com.commerce.kotlin.domain.seller
 import com.commerce.kotlin.common.constant.SESSION_NAME
 import com.commerce.kotlin.common.constant.SessionBody
 import com.commerce.kotlin.domain.seller.dto.CreateSellerDto
+import com.commerce.kotlin.domain.seller.dto.GetSellerResponse
 import com.commerce.kotlin.domain.seller.dto.PostSellerResponse
+import com.commerce.kotlin.domain.seller.dto.UpdateSellerDto
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,9 +24,13 @@ import org.springframework.web.bind.annotation.SessionAttribute
 class SellerController(
     val sellerService: SellerService
 ) {
-    @GetMapping
-    fun getSellerMyself() {
-
+    @GetMapping("me")
+    fun getSellerMyself(
+        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody
+    ): GetSellerResponse {
+        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        val seller = this.sellerService.findSellerById(sellerId)
+        return GetSellerResponse(name = seller.name, address = seller.address)
     }
 
     @PostMapping
@@ -40,5 +48,24 @@ class SellerController(
         return PostSellerResponse(
             sellerId = sellerId
         )
+    }
+
+    @PatchMapping("me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun patchSeller(
+        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody,
+        @RequestBody updateSellerDto: UpdateSellerDto
+    ) {
+        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        this.sellerService.updateSeller(sellerId, updateSellerDto)
+    }
+
+    @DeleteMapping("me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteSeller(
+        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody
+    ) {
+        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        this.sellerService.removeSeller(sellerId)
     }
 }
