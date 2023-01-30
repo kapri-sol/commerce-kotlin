@@ -3,6 +3,7 @@ package com.commerce.kotlin.account
 import com.commerce.kotlin.common.constant.SESSION_NAME
 import com.commerce.kotlin.domain.account.dto.CreateAccountDto
 import com.commerce.kotlin.domain.account.Account
+import com.commerce.kotlin.domain.account.AccountController
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.account.dto.GetAccountResponse
 import com.commerce.kotlin.domain.account.dto.PostAccountResponse
@@ -10,10 +11,10 @@ import com.commerce.kotlin.domain.auth.dto.LoginDto
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AccountControllerTest(
     @Autowired
@@ -35,11 +37,6 @@ class AccountControllerTest(
 ) {
 
     private val faker = Faker()
-
-    @AfterEach
-    fun deleteAll() {
-        this.accountRepository.deleteAll()
-    }
 
     @Test
     @DisplayName("계정을 생성한다.")

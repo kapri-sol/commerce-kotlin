@@ -10,26 +10,38 @@ import com.commerce.kotlin.domain.customer.dto.CreateCustomerDto
 import com.commerce.kotlin.domain.customer.dto.GetCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.PostCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.UpdateCustomerDto
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
+import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MockMvcBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
+@AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
 class CustomerControllerTest(
     @Autowired private val accountRepository: AccountRepository,
     @Autowired private val customerRepository: CustomerRepository,
-    @Autowired private val mockMvc: MockMvc
+    @Autowired private val mockMvc: MockMvc,
+    @Autowired private val objectMapper: ObjectMapper
 ) {
     val faker = Faker()
 
@@ -52,20 +64,22 @@ class CustomerControllerTest(
         val sessionAttr = HashMap<String, Any>()
         sessionAttr[SESSION_NAME] = account.id!!
 
-        val postCustomerResponse = PostCustomerResponse(
-            customerId = 1L
-        )
-
         // when
-        this.mockMvc.perform(
-            MockMvcRequestBuilders.post("/customers")
+        val perform = this.mockMvc.perform(
+            post("/customers")
                 .sessionAttrs(sessionAttr)
-                .content(jacksonObjectMapper().writeValueAsString(createCustomerDto))
+                .content(objectMapper.writeValueAsString(createCustomerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             // then
             .andExpect(status().isCreated)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(postCustomerResponse)))
+
+        val postCustomerResponse = objectMapper.readValue(
+            perform.andReturn().response.contentAsString,
+            PostCustomerResponse::class.java
+        )
+
+        assertThat(postCustomerResponse.customerId).isNotNull()
     }
 
     @Test
@@ -100,12 +114,12 @@ class CustomerControllerTest(
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.get("/customers/me")
+            get("/customers/me")
                 .sessionAttrs(sessionAttr)
         )
             // then
             .andExpect(status().isOk)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getCustomerResponse)))
+            .andExpect(content().json(objectMapper.writeValueAsString(getCustomerResponse)))
     }
 
     @Test
@@ -140,9 +154,9 @@ class CustomerControllerTest(
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.patch("/customers/me")
+            patch("/customers/me")
                 .sessionAttrs(sessionAttr)
-                .content(jacksonObjectMapper().writeValueAsString(updateCustomerDto))
+                .content(objectMapper.writeValueAsString(updateCustomerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             // then
@@ -150,9 +164,9 @@ class CustomerControllerTest(
 
         val updateCustomer = this.customerRepository.findByIdOrNull(customer.id)
 
-        Assertions.assertThat(updateCustomer).isNotNull
-        Assertions.assertThat(updateCustomer?.name).isEqualTo(updateCustomerDto.name)
-        Assertions.assertThat(updateCustomer?.address).isEqualTo(updateCustomerDto.address)
+        assertThat(updateCustomer).isNotNull
+        assertThat(updateCustomer?.name).isEqualTo(updateCustomerDto.name)
+        assertThat(updateCustomer?.address).isEqualTo(updateCustomerDto.address)
     }
 
     @Test
@@ -182,7 +196,7 @@ class CustomerControllerTest(
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.delete("/customers/me")
+            delete("/customers/me")
                 .sessionAttrs(sessionAttr)
         )
             // then
@@ -190,6 +204,6 @@ class CustomerControllerTest(
 
         val deletedCustomer = this.customerRepository.findByIdOrNull(customer.id)
 
-        Assertions.assertThat(deletedCustomer).isNull()
+        assertThat(deletedCustomer).isNull()
     }
 }
