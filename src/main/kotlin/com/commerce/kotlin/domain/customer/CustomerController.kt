@@ -1,14 +1,13 @@
 package com.commerce.kotlin.domain.customer
 
-import com.commerce.kotlin.common.constant.SESSION_NAME
-import com.commerce.kotlin.common.constant.SessionBody
 import com.commerce.kotlin.domain.customer.dto.CreateCustomerDto
 import com.commerce.kotlin.domain.customer.dto.GetCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.PostCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.UpdateCustomerDto
-import jakarta.servlet.http.HttpServletRequest
+import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("customers")
@@ -18,39 +17,42 @@ class CustomerController(
 ) {
 
     @GetMapping("me")
-    fun getCustomer(@SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody): GetCustomerResponse {
-        val customerId = sessionBody.customerId ?: throw NotFoundException()
+    fun findCustomerByMe(authentication: Authentication): GetCustomerResponse {
+        val customUserDetails = authentication.principal as CustomUserDetails
+        val customerId = customUserDetails.customerId ?: throw NotFoundException()
         val customer = this.customerService.findCustomerById(customerId)
         return GetCustomerResponse(name = customer.name, address = customer.address)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postCustomer(
-        httpServletRequest: HttpServletRequest,
-        @RequestBody createCustomerDto: CreateCustomerDto
+    fun createCustomer(
+        authentication: Authentication,
+        @RequestBody createCustomerDto: CreateCustomerDto,
     ): PostCustomerResponse {
-        val accountId = httpServletRequest.session.getAttribute(SESSION_NAME) as Long
+        val customUserDetails = authentication.principal as CustomUserDetails
+        val accountId = customUserDetails.accountId
+
         val customerId = this.customerService.createCustomer(accountId, createCustomerDto)
-        val sessionBody = SessionBody(accountId = accountId, customerId = customerId)
-        httpServletRequest.session.setAttribute(SESSION_NAME, sessionBody)
+        customUserDetails.setCustomerId(customerId)
+
         return PostCustomerResponse(customerId = customerId)
     }
 
     @PatchMapping("me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun patchCustomer(
-        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody,
+        authentication: Authentication,
         @RequestBody updateCustomerDto: UpdateCustomerDto
     ) {
-        val customerId = sessionBody.customerId ?: throw NotFoundException()
+        val customerId = (authentication.principal as CustomUserDetails).customerId ?: throw NotFoundException()
         this.customerService.updateCustomer(customerId, updateCustomerDto)
     }
 
     @DeleteMapping("me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteCustomer(@SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody) {
-        val customerId = sessionBody.customerId ?: throw NotFoundException()
+    fun deleteCustomer(authentication: Authentication) {
+        val customerId = (authentication.principal as CustomUserDetails).customerId ?: throw NotFoundException()
         this.customerService.removeCustomer(customerId)
     }
 }

@@ -1,10 +1,4 @@
-
 spring:
-  datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
   output:
     ansi:
       enable: always
@@ -18,17 +12,19 @@ spring:
 logging:
   level:
     org:
+      springframework:
+        security: debug
       hibernate:
 #        SQL: DEBUG
         type:
           descriptor:
             sql: trace
-server:
-  servlet:
-    session:
-      cookie:
-        name: my-cookie
-#        http-only: true
-#        secure: true
-      tracking-modes: cookie
-      timeout: 1800
+
+#  servlet:
+#    session:
+#      cookie:
+#        name: my-cookie
+##        http-only: true
+##        secure: true
+#      tracking-modes: cookie
+#      timeout: 1800

@@ -1,4 +1,4 @@
-package com.commerce.kotlin.config
+package com.commerce.kotlin.security.config
 
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.security.authentication.RestAuthenticationEntryPoint
@@ -13,25 +13,34 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfiguration {
-    @Autowired private lateinit var authenticationConfiguration: AuthenticationConfiguration
-    @Autowired private lateinit var accountRepository: AccountRepository
+@EnableMethodSecurity
+class RestSecurityConfiguration {
+    @Autowired
+    private lateinit var authenticationConfiguration: AuthenticationConfiguration
+
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
@@ -44,12 +53,28 @@ class SecurityConfiguration {
     }
 
     @Bean
+    fun authenticationProvider(): AuthenticationProvider {
+        return RestAuthenticationProvider(
+            passwordEncoder = passwordEncoder(),
+            userDetailsService = userDetailService()
+        )
+    }
+
+    @Bean
     fun authenticationManager(): AuthenticationManager {
         val authenticationManger = authenticationConfiguration.authenticationManager as ProviderManager
-        authenticationManger.providers.add(RestAuthenticationProvider(
-            passwordEncoder =  passwordEncoder(),
-            userDetailsService =  userDetailService()))
+        authenticationManger.providers.add(authenticationProvider())
         return authenticationManger
+    }
+
+    @Bean
+    fun authenticationSuccessHandler(): AuthenticationSuccessHandler {
+        return RestAuthenticationSuccessHandler()
+    }
+
+    @Bean
+    fun authenticationFailureHandler(): AuthenticationFailureHandler {
+        return RestAuthenticationFailureHandler()
     }
 
     @Bean
@@ -57,9 +82,19 @@ class SecurityConfiguration {
         val authenticationProcessingFilter = RestAuthenticationProcessingFilter(AntPathRequestMatcher("/auth/login"))
         authenticationProcessingFilter.setSecurityContextRepository(HttpSessionSecurityContextRepository())
         authenticationProcessingFilter.setAuthenticationManager(authenticationManager())
-        authenticationProcessingFilter.setAuthenticationSuccessHandler(RestAuthenticationSuccessHandler())
-        authenticationProcessingFilter.setAuthenticationFailureHandler(RestAuthenticationFailureHandler())
+        authenticationProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler())
+        authenticationProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler())
         return authenticationProcessingFilter
+    }
+
+    @Bean
+    fun authenticationEntryPoint(): AuthenticationEntryPoint {
+        return RestAuthenticationEntryPoint()
+    }
+
+    @Bean
+    fun accessDeniedHandler(): AccessDeniedHandler {
+        return RestAccessDeniedHandler()
     }
 
     @Bean
@@ -71,8 +106,8 @@ class SecurityConfiguration {
             .and()
             .addFilterBefore(authenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling()
-            .authenticationEntryPoint(RestAuthenticationEntryPoint())
-            .accessDeniedHandler(RestAccessDeniedHandler())
+            .authenticationEntryPoint(authenticationEntryPoint())
+            .accessDeniedHandler(accessDeniedHandler())
             .and()
             .csrf().disable()
             .build()

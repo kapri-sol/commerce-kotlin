@@ -5,12 +5,14 @@ import com.commerce.kotlin.domain.account.dto.UpdateAccountDto
 import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Transactional
 @Service
 class AccountService (
-    private  val accountRepository: AccountRepository
+    private val passwordEncoder: PasswordEncoder,
+    private val accountRepository: AccountRepository
 ) {
     private fun validateEmailDuplicated(email: String) {
         val account = this.accountRepository.findByEmail(email)
@@ -21,7 +23,7 @@ class AccountService (
     }
 
     private fun validatePhoneNumberDuplicated(phoneNumber: String) {
-        val account = this.accountRepository.findByPhoneNumber(phoneNumber);
+        val account = this.accountRepository.findByPhoneNumber(phoneNumber)
 
         if (account !== null) {
             throw IllegalStateException()
@@ -35,7 +37,7 @@ class AccountService (
         val createAccount = Account(
             email = createAccountDto.email,
             phoneNumber = createAccountDto.phoneNumber,
-            password = createAccountDto.password
+            password = passwordEncoder.encode(createAccountDto.password)
         )
         return this.accountRepository.save(createAccount).id ?: throw InternalError()
     }

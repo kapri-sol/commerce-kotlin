@@ -16,11 +16,13 @@ class RestUserDetailService(
 
         val account = accountRepository.findByEmail(username) ?: throw ChangeSetPersister.NotFoundException()
 
-        return AccountContext(
-            username = account.email,
-            password = null,
-            authorities =  arrayListOf(SimpleGrantedAuthority("USER")),
-            id = account.id
+        return CustomUserDetails(
+            accountId = account.id!!,
+            email = account.email,
+            password = account.password,
+            authorities = arrayListOf(SimpleGrantedAuthority("USER")),
+            customerId = null,
+            sellerId = null
         )
     }
 }

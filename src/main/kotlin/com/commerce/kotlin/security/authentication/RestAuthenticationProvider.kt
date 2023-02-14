@@ -9,12 +9,11 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class RestAuthenticationProvider(
     private val passwordEncoder: PasswordEncoder,
     private val userDetailsService: UserDetailsService,
-): AuthenticationProvider {
-
+) : AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication?): Authentication {
         if (authentication == null) {
-           throw IllegalStateException("Authentication is null")
+            throw IllegalStateException("Authentication is null")
         }
         val username = authentication.name
         val password = authentication.credentials as String
@@ -22,7 +21,7 @@ class RestAuthenticationProvider(
         val accountContext = userDetailsService.loadUserByUsername(username)
 
         if (!passwordEncoder.matches(password, accountContext.password)) {
-           throw BadCredentialsException("Bad Credential")
+            throw BadCredentialsException("Bad Credential")
         }
 
         return RestAuthenticationToken(
@@ -33,6 +32,7 @@ class RestAuthenticationProvider(
     }
 
     override fun supports(authentication: Class<*>?): Boolean {
-        return authentication?.equals(RestAuthenticationToken::class.java) ?: throw IllegalStateException("Authentication is Null")
+        return authentication?.equals(RestAuthenticationToken::class.java)
+            ?: throw IllegalStateException("Authentication is Null")
     }
 }
