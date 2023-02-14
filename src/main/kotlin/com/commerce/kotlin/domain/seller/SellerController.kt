@@ -6,9 +6,11 @@ import com.commerce.kotlin.domain.seller.dto.CreateSellerDto
 import com.commerce.kotlin.domain.seller.dto.GetSellerResponse
 import com.commerce.kotlin.domain.seller.dto.PostSellerResponse
 import com.commerce.kotlin.domain.seller.dto.UpdateSellerDto
+import com.commerce.kotlin.security.authentication.CustomUserDetails
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -26,9 +28,9 @@ class SellerController(
 ) {
     @GetMapping("me")
     fun getSellerMyself(
-        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody
+        authentication: Authentication
     ): GetSellerResponse {
-        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        val sellerId = (authentication.principal as CustomUserDetails).sellerId ?: throw NotFoundException()
         val seller = this.sellerService.findSellerById(sellerId)
         return GetSellerResponse(name = seller.name, address = seller.address)
     }
@@ -36,14 +38,14 @@ class SellerController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun postSeller(
-        httpServletRequest: HttpServletRequest,
+        authentication: Authentication,
         @RequestBody createSellerDto: CreateSellerDto
     ): PostSellerResponse {
-        val sessionBody = httpServletRequest.session.getAttribute(SESSION_NAME) as SessionBody
-        val sellerId = this.sellerService.createSeller(sessionBody.accountId, createSellerDto)
+        val customUserDetails = authentication.principal as CustomUserDetails
+        val accountId = customUserDetails.accountId
+        val sellerId = this.sellerService.createSeller(accountId, createSellerDto)
 
-        sessionBody.sellerId = sellerId
-        httpServletRequest.session.setAttribute(SESSION_NAME, sessionBody)
+        customUserDetails.setSellerId(sellerId)
 
         return PostSellerResponse(
             sellerId = sellerId
@@ -53,19 +55,19 @@ class SellerController(
     @PatchMapping("me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun patchSeller(
-        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody,
+        authentication: Authentication,
         @RequestBody updateSellerDto: UpdateSellerDto
     ) {
-        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        val sellerId = (authentication.principal as CustomUserDetails).sellerId ?: throw NotFoundException()
         this.sellerService.updateSeller(sellerId, updateSellerDto)
     }
 
     @DeleteMapping("me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteSeller(
-        @SessionAttribute(name = SESSION_NAME) sessionBody: SessionBody
+        authentication: Authentication,
     ) {
-        val sellerId = sessionBody.sellerId ?: throw NotFoundException()
+        val sellerId = (authentication.principal as CustomUserDetails).sellerId ?: throw NotFoundException()
         this.sellerService.removeSeller(sellerId)
     }
 }

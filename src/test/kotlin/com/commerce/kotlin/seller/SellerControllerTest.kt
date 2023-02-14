@@ -10,6 +10,7 @@ import com.commerce.kotlin.domain.seller.dto.CreateSellerDto
 import com.commerce.kotlin.domain.seller.dto.GetSellerResponse
 import com.commerce.kotlin.domain.seller.dto.PostSellerResponse
 import com.commerce.kotlin.domain.seller.dto.UpdateSellerDto
+import com.commerce.kotlin.util.WithMockCustomUser
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
@@ -34,6 +35,7 @@ class SellerControllerTest(
     val faker = Faker()
 
     @Test
+    @WithMockCustomUser
     @DisplayName("POST Seller")
     fun postSeller() {
         // given
@@ -49,13 +51,9 @@ class SellerControllerTest(
             address = faker.address().fullAddress()
         )
 
-        val sessionAttr = HashMap<String, Any>()
-        sessionAttr[SESSION_NAME] = SessionBody(accountId = account.id!!)
-
         // when
         val perform = this.mockMvc.perform(
             MockMvcRequestBuilders.post("/sellers")
-                .sessionAttrs(sessionAttr)
                 .content(jacksonObjectMapper().writeValueAsString(createSellerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -71,6 +69,7 @@ class SellerControllerTest(
     }
 
     @Test
+    @WithMockCustomUser(accountId = 1L, sellerId = 1L)
     @DisplayName("GET seller ME")
     fun getSellerMyself() {
         // given
@@ -87,13 +86,6 @@ class SellerControllerTest(
         )
         val seller = this.sellerRepository.save(createSeller)
 
-
-        val sessionAttr = HashMap<String, Any>()
-        sessionAttr[SESSION_NAME] = SessionBody(
-            accountId = account.id!!,
-            sellerId = seller.id
-        )
-
         val getSellerResponse = GetSellerResponse(
             name = seller.name,
             address = seller.address
@@ -102,7 +94,6 @@ class SellerControllerTest(
         // when
         this.mockMvc.perform(
             MockMvcRequestBuilders.get("/sellers/me")
-                .sessionAttrs(sessionAttr)
         )
             // then
             .andExpect(status().isOk)
@@ -112,6 +103,7 @@ class SellerControllerTest(
 
 
     @Test
+    @WithMockCustomUser(accountId = 1L, sellerId = 1L)
     @DisplayName("PATCH Seller")
     fun patchSeller() {
         // given
@@ -120,19 +112,13 @@ class SellerControllerTest(
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = faker.internet().password()
         )
-        val account = this.accountRepository.save(createAccount)
+        this.accountRepository.save(createAccount)
 
         val createSeller = Seller(
             name = faker.name().fullName(),
             address = faker.address().fullAddress()
         )
         val seller = this.sellerRepository.save(createSeller)
-
-        val sessionAttr = HashMap<String, Any>()
-        sessionAttr[SESSION_NAME] = SessionBody(
-            accountId = account.id!!,
-            sellerId = seller.id
-        )
 
         val updateSellerDto = UpdateSellerDto(
             name = faker.name().username(),
@@ -142,7 +128,6 @@ class SellerControllerTest(
         // when
         this.mockMvc.perform(
             MockMvcRequestBuilders.patch("/sellers/me")
-                .sessionAttrs(sessionAttr)
                 .content(jacksonObjectMapper().writeValueAsString(updateSellerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -156,6 +141,7 @@ class SellerControllerTest(
     }
 
     @Test
+    @WithMockCustomUser(accountId = 1L, sellerId = 1L)
     @DisplayName("DELETE Seller")
     fun deleteSeller() {
         // given
@@ -164,7 +150,7 @@ class SellerControllerTest(
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = faker.internet().password()
         )
-        val account = this.accountRepository.save(createAccount)
+        this.accountRepository.save(createAccount)
 
         val createSeller = Seller(
             name = faker.name().fullName(),
@@ -172,16 +158,9 @@ class SellerControllerTest(
         )
         val seller = this.sellerRepository.save(createSeller)
 
-        val sessionAttr = HashMap<String, Any>()
-        sessionAttr[SESSION_NAME] = SessionBody(
-            accountId = account.id!!,
-            sellerId = seller.id
-        )
-
         // when
         this.mockMvc.perform(
             MockMvcRequestBuilders.delete("/sellers/me")
-                .sessionAttrs(sessionAttr)
         )
             // then
             .andExpect(status().isNoContent)
