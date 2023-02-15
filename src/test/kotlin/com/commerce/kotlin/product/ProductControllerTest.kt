@@ -9,7 +9,8 @@ import com.commerce.kotlin.domain.product.dto.GetProductResponse
 import com.commerce.kotlin.domain.product.dto.PostProductResponse
 import com.commerce.kotlin.domain.seller.Seller
 import com.commerce.kotlin.domain.seller.SellerRepository
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.commerce.kotlin.util.WithMockCustomUser
+import com.fasterxml.jackson.databind.ObjectMapper
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -18,27 +19,33 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @AutoConfigureMockMvc
 @SpringBootTest
-class ProductControllerTest(
-    @Autowired val mockMvc: MockMvc,
-    @Autowired val accountRepository: AccountRepository,
-    @Autowired val sellerRepository: SellerRepository,
-    @Autowired val productRepository: ProductRepository
-) {
+class ProductControllerTest {
+    @Autowired
+    lateinit var mockMvc: MockMvc
+
+    @Autowired
+    lateinit var accountRepository: AccountRepository
+
+    @Autowired
+    lateinit var sellerRepository: SellerRepository
+
+    @Autowired
+    lateinit var productRepository: ProductRepository
+
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
+
     val faker = Faker()
 
-    @Test
-    @DisplayName("GET Product")
-    fun getProduct() {
-        // given
+    fun generateSeller(): Seller {
         val account = accountRepository.save(
             Account(
                 email = faker.internet().emailAddress(),
@@ -53,6 +60,14 @@ class ProductControllerTest(
             )
         )
         account.setSeller(seller)
+        return seller
+    }
+
+    @Test
+    @DisplayName("GET Product")
+    fun getProduct() {
+        // given
+        generateSeller()
 
         val product = productRepository.save(
             Product(
@@ -76,27 +91,15 @@ class ProductControllerTest(
         )
             // then
             .andExpect(status().isOk)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getProductResponse)))
+            .andExpect(content().json(objectMapper.writeValueAsString(getProductResponse)))
     }
 
     @Test
     @DisplayName("POST Product")
+    @WithMockCustomUser(accountId = 1L, sellerId = 1L)
     fun postProduct() {
         // given
-        val account = accountRepository.save(
-            Account(
-                email = faker.internet().emailAddress(),
-                phoneNumber = faker.phoneNumber().phoneNumber(),
-                password = faker.internet().password()
-            )
-        )
-        val seller = sellerRepository.save(
-            Seller(
-                name = faker.name().fullName(),
-                address = faker.address().fullAddress()
-            )
-        )
-        account.setSeller(seller)
+        generateSeller()
 
         val createProductDto = CreateProductDto(
             name = faker.commerce().productName(),
@@ -108,12 +111,12 @@ class ProductControllerTest(
         //when
         val perform = mockMvc.perform(
             post("/products")
-                .content(jacksonObjectMapper().writeValueAsString(createProductDto))
+                .content(objectMapper.writeValueAsString(createProductDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isCreated)
 
-        val postProductResponse = jacksonObjectMapper().readValue(
+        val postProductResponse = objectMapper.readValue(
             perform.andReturn().response.contentAsString,
             PostProductResponse::class.java
         )

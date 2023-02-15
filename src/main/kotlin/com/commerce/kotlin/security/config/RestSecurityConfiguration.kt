@@ -102,6 +102,7 @@ class RestSecurityConfiguration {
         return http
             .authorizeHttpRequests()
             .requestMatchers(HttpMethod.POST, "/accounts/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilterBefore(authenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)
