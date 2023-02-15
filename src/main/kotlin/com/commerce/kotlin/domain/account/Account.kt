@@ -9,7 +9,7 @@ import org.hibernate.annotations.Where
 
 @Where(clause = "deleted IS FALSE")
 @Entity
-class Account(
+open class Account(
     email: String,
     phoneNumber: String,
     password: String,
@@ -17,7 +17,7 @@ class Account(
 {
     @Id
     @GeneratedValue
-    val id: Long? = null
+    open val id: Long? = null
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id")

@@ -1,0 +1,8 @@
+include::{snippets}/account/curl-request.adoc[]
+include::{snippets}/account/http-request.adoc[]
+include::{snippets}/account/http-response.adoc[]
+include::{snippets}/account/httpie-request.adoc[]
+include::{snippets}/account/request-body.adoc[]
+include::{snippets}/account/request-fields.adoc[]
+include::{snippets}/account/response-body.adoc[]
+include::{snippets}/account/response-fields.adoc[]
