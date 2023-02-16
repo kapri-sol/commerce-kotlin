@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.seller.dto
 
-data class GetSellerResponse(
+data class FindSellerResponse(
     val name: String,
     val address: String
 )

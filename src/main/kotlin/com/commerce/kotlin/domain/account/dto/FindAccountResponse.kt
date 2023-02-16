@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.account.dto
 
-data class GetAccountResponse(
+data class FindAccountResponse(
     val email: String,
     val phoneNumber: String
 )

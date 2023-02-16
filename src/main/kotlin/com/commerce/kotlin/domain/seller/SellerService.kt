@@ -20,7 +20,7 @@ class SellerService(
             name = createSellerDto.name,
             address = createSellerDto.address,
         )
-        account.setSeller(seller)
+        account.changeSeller(seller)
         return this.sellerRepository.save(seller).id ?: throw IllegalStateException()
     }
 

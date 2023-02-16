@@ -9,45 +9,64 @@ import com.commerce.kotlin.domain.seller.SellerRepository
 import com.commerce.kotlin.domain.seller.SellerService
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.transaction.annotation.Transactional
 
 
+@Transactional
 @SpringBootTest
-class SellerServiceTest(
-    @Autowired private val accountRepository: AccountRepository,
-    @Autowired private val sellerRepository: SellerRepository,
-    @Autowired private val sellerService: SellerService
-) {
+class SellerServiceTest{
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
 
-    private val faker = Faker()
+    @Autowired
+    private lateinit var sellerRepository: SellerRepository
 
-    fun generateAccount(): Account {
-        val account = Account(
-            email = faker.internet().emailAddress(),
-            phoneNumber = faker.phoneNumber().phoneNumber(),
-            password = faker.internet().password()
-        )
-        return this.accountRepository.save(account)
-    }
+    @Autowired
+    private lateinit var sellerService: SellerService
 
-    fun generateSeller(): Seller {
-        val seller = Seller(
-            name = faker.name().fullName(),
-            address = faker.address().fullAddress()
-        )
-        return this.sellerRepository.save(seller)
+    companion object {
+        private lateinit var initialAccount: Account
+        lateinit var initialSeller: Seller
+        val faker = Faker()
+
+        @JvmStatic
+        @BeforeAll
+        fun init(@Autowired accountRepository: AccountRepository, @Autowired sellerRepository: SellerRepository): Unit {
+            initialAccount = accountRepository.save(
+                Account(
+                    email = faker.internet().emailAddress(),
+                    phoneNumber = faker.phoneNumber().phoneNumber(),
+                    password = faker.internet().password()
+                )
+            )
+
+            initialSeller = sellerRepository.save(
+                Seller(
+                    name = faker.name().fullName(),
+                    address = faker.address().fullAddress()
+                )
+            )
+
+            initialAccount.changeSeller(initialSeller)
+        }
     }
 
     @Test
     @DisplayName("판매자를 생성한다.")
     fun createSeller() {
         // given
-        val account = this.generateAccount()
+        val account = accountRepository.save(
+            Account(
+                email = faker.internet().emailAddress(),
+                phoneNumber = faker.phoneNumber().phoneNumber(),
+                password = faker.internet().password()
+            )
+        )
 
         val createSellerDto = CreateSellerDto(
             name = faker.name().fullName(),
@@ -67,7 +86,7 @@ class SellerServiceTest(
     @DisplayName("판매자를 검색한다.")
     fun findSeller() {
         // given
-        val seller = generateSeller()
+        val seller = initialSeller
         // when
         val findSeller = this.sellerService.findSellerById(seller.id!!)
         // then
@@ -80,7 +99,8 @@ class SellerServiceTest(
     @DisplayName("판매자 정보를 수정한다.")
     fun updateSeller() {
         // given
-        val seller = generateSeller()
+        val seller = initialSeller
+
         val updateSellerDto = UpdateSellerDto(
             name = faker.name().fullName(),
             address = faker.address().fullAddress()
@@ -100,11 +120,11 @@ class SellerServiceTest(
     @DisplayName("판매자를 제거한다.")
     fun removeSeller() {
         // given
-        val seller = generateSeller()
+        val seller = initialSeller
         // when
         this.sellerService.removeSeller(seller.id!!)
         val findSeller = this.sellerRepository.findByIdOrNull(seller.id!!)
         // then
-        assertThat(findSeller).isNull()
+        assertThat(findSeller?.deleted).isTrue
     }
 }

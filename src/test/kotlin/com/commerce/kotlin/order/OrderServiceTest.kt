@@ -6,41 +6,57 @@ import com.commerce.kotlin.domain.order.OrderService
 import com.commerce.kotlin.domain.order.dto.CreateOrderDto
 import com.commerce.kotlin.domain.order.dto.CreateOrderItemDto
 import com.commerce.kotlin.domain.product.ProductRepository
+import com.commerce.kotlin.product.ProductControllerTest
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 @SpringBootTest
-class OrderServiceTest(
-    @Autowired val productRepository: ProductRepository,
-    @Autowired val orderRepository: OrderRepository,
-    @Autowired val orderService: OrderService
-) {
-    val faker = Faker()
+class OrderServiceTest{
+    @Autowired
+    private lateinit var productRepository: ProductRepository
 
-    fun generateProduct(): Product {
-        val product = Product(
-            name = faker.commerce().productName(),
-            description = faker.lorem().sentence(),
-            price = faker.commerce().price().toInt(),
-            stockQuantity = faker.random().nextInt(11, 100)
-        )
-        return this.productRepository.save(product)
-    }
+    @Autowired
+    private lateinit var orderRepository: OrderRepository
 
-    fun generateProducts(count: Int): List<Product> {
-        return List(count){generateProduct()}
+    @Autowired
+    private lateinit var orderService: OrderService
+
+    companion object {
+        val initialProducts: ArrayList<Product> = arrayListOf()
+
+        val faker = Faker()
+
+        @JvmStatic
+        @BeforeAll
+        fun init(@Autowired productRepository: ProductRepository): Unit {
+            for (i: Int in 1..3) {
+                val product = productRepository.save(
+                    Product(
+                        name = faker.commerce().productName(),
+                        description = faker.lorem().sentence(),
+                        price = faker.commerce().price().toDouble().toInt(),
+                        stockQuantity = faker.random().nextInt(1, 100).toInt()
+                    )
+                )
+                initialProducts.add(product)
+            }
+        }
     }
 
     @Test
     @DisplayName("주문한다.")
     fun order() {
         // given
-        val products = generateProducts(faker.random().nextInt(1, 9))
+        val products = initialProducts
         val createOrderItemsDto = products.map {
             CreateOrderItemDto(
                 productId = it.id!!,

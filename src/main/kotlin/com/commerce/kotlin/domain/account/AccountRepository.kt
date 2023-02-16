@@ -9,5 +9,5 @@ interface AccountRepository : JpaRepository<Account, Long> {
     fun findByPhoneNumber(phoneNumber: String): Account?
 
     @Query("select ac from Account ac join fetch Customer cu where ac.id = :id")
-    fun findByIdWithCustomer(id : Long): Account?
+    fun findByIdWithCustomer(id: Long): Account?
 }

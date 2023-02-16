@@ -1,5 +1,5 @@
 package com.commerce.kotlin.domain.product.dto
 
-data class PostProductResponse(
+data class CreateProductResponse(
     val productId: Long
 )

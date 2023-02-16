@@ -9,15 +9,14 @@ import org.hibernate.annotations.Where
 
 @Where(clause = "deleted IS FALSE")
 @Entity
-open class Account(
+class Account(
     email: String,
     phoneNumber: String,
     password: String,
-): BaseEntity()
-{
+) : BaseEntity() {
     @Id
     @GeneratedValue
-    open val id: Long? = null
+    val id: Long? = null
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id")
@@ -39,7 +38,7 @@ open class Account(
     var password = password
         private set
 
-    private var deleted: Boolean? = false
+    var deleted: Boolean? = false
 
     fun remove() {
         this.deleted = true
@@ -58,7 +57,7 @@ open class Account(
         return this.password == password
     }
 
-    fun setCustomer(customer: Customer) {
+    fun changeCustomer(customer: Customer) {
         if (this.customer != null) {
             throw Error()
         }
@@ -66,7 +65,7 @@ open class Account(
         this.customer = customer
     }
 
-    fun setSeller(seller: Seller) {
+    fun changeSeller(seller: Seller) {
         this.seller = seller
     }
 }

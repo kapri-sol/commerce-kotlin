@@ -1,6 +1,6 @@
 package com.commerce.kotlin.domain.product.dto
 
-data class GetProductResponse(
+data class FindProductResponse(
     val name: String,
     val description: String,
     val price: Int,

@@ -1,5 +1,5 @@
 package com.commerce.kotlin.domain.seller.dto
 
-data class PostSellerResponse(
+data class CreateSellerResponse(
     val sellerId: Long
 )

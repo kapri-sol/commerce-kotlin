@@ -1,8 +1,8 @@
 package com.commerce.kotlin.domain.account
 
 import com.commerce.kotlin.domain.account.dto.CreateAccountDto
-import com.commerce.kotlin.domain.account.dto.GetAccountResponse
-import com.commerce.kotlin.domain.account.dto.PostAccountResponse
+import com.commerce.kotlin.domain.account.dto.FindAccountResponse
+import com.commerce.kotlin.domain.account.dto.CreateAccountResponse
 import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
@@ -20,11 +20,11 @@ class AccountController(
 ) {
 
     @GetMapping("/me")
-    fun getAccount(authentication: Authentication): GetAccountResponse {
+    fun getAccount(authentication: Authentication): FindAccountResponse {
         val customUserDetails = authentication.principal as CustomUserDetails
         val accountId = customUserDetails.accountId
         val account = accountService.findAccount(accountId)
-        return GetAccountResponse(
+        return FindAccountResponse(
             email = account.email,
             phoneNumber = account.phoneNumber
         )
@@ -32,8 +32,8 @@ class AccountController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postAccount(@RequestBody createAccountDto: CreateAccountDto): PostAccountResponse {
+    fun postAccount(@RequestBody createAccountDto: CreateAccountDto): CreateAccountResponse {
         val accountId = this.accountService.createAccount(createAccountDto)
-        return PostAccountResponse(id = accountId)
+        return CreateAccountResponse(id = accountId)
     }
 }

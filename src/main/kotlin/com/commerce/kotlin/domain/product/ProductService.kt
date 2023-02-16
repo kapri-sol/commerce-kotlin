@@ -23,7 +23,7 @@ class ProductService(
             price = createProductDto.price,
             stockQuantity = createProductDto.stockQuantity
         )
-        product.setSeller(seller)
+        product.connectSeller(seller)
         return this.productRepository.save(product).id!!
     }
 

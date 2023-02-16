@@ -8,8 +8,8 @@ import java.time.LocalDateTime
 @MappedSuperclass
 abstract class BaseEntity {
     @CreatedDate
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    open val createdAt: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
-    val updateAt: LocalDateTime = LocalDateTime.now()
+    open val updateAt: LocalDateTime = LocalDateTime.now()
 }

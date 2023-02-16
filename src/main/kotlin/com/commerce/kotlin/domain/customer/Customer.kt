@@ -23,7 +23,7 @@ class Customer(
     var address: String = address
         private set
 
-    private var deleted: Boolean = false
+    var deleted: Boolean = false
 
     fun remove() {
         this.deleted = true

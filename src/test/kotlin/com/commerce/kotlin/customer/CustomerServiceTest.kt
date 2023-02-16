@@ -9,45 +9,70 @@ import com.commerce.kotlin.domain.customer.CustomerService
 import com.commerce.kotlin.domain.customer.CustomerRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.transaction.annotation.Transactional
 
-
+@Transactional
 @SpringBootTest
-class CustomerServiceTest(
-    @Autowired private val accountRepository: AccountRepository,
-    @Autowired private val customerRepository: CustomerRepository,
-    @Autowired private val customerService: CustomerService
-) {
+class CustomerServiceTest{
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
 
-    private val faker = Faker()
+    @Autowired
+    private lateinit var customerRepository: CustomerRepository
 
-    fun generateAccount(): Account {
-        val account = Account(
-            email = faker.internet().emailAddress(),
-            phoneNumber = faker.phoneNumber().phoneNumber(),
-            password = faker.internet().password()
-        )
-        return this.accountRepository.save(account)
+    @Autowired
+    private lateinit var customerService: CustomerService
+
+    companion object {
+        private lateinit var initialAccount: Account
+        lateinit var initialCustomer: Customer
+
+        val faker = Faker()
+
+        @JvmStatic
+        @BeforeAll
+        fun init(
+            @Autowired accountRepository: AccountRepository,
+            @Autowired customerRepository: CustomerRepository
+        ): Unit {
+            initialAccount = accountRepository.save(
+                Account(
+                    email = faker.internet().emailAddress(),
+                    phoneNumber = faker.phoneNumber().phoneNumber(),
+                    password = faker.internet().password()
+                )
+            )
+
+            initialCustomer = customerRepository.save(
+                Customer(
+                    name = faker.name().fullName(),
+                    address = faker.address().fullAddress()
+                )
+            )
+
+            initialAccount.changeCustomer(initialCustomer)
+        }
     }
 
-    fun generateCustomer(): Customer {
-        val customer = Customer(
-            name = faker.name().fullName(),
-            address = faker.address().fullAddress()
-        )
-        return this.customerRepository.save(customer)
-    }
-
-    @DisplayName("고객을 생성한다.")
     @Test
+    @DisplayName("고객을 생성한다.")
     fun createCustomer() {
         // given
-        val account = this.generateAccount()
+        val account = accountRepository.save(
+            Account(
+                email = faker.internet().emailAddress(),
+                phoneNumber = faker.phoneNumber().phoneNumber(),
+                password = faker.internet().password()
+            )
+        )
 
         val createCustomerDto = CreateCustomerDto(
             name = faker.name().fullName(),
@@ -68,7 +93,7 @@ class CustomerServiceTest(
     @DisplayName("고객을 검색한다.")
     fun findCustomer() {
         // given
-        val customer = generateCustomer()
+        val customer = initialCustomer
         // when
         val findCustomer = this.customerService.findCustomerById(customer.id!!)
         // then
@@ -81,7 +106,7 @@ class CustomerServiceTest(
     @DisplayName("고객 정보를 수정한다.")
     fun updateCustomer() {
         // given
-        val customer = generateCustomer()
+        val customer = initialCustomer
         val updateCustomerDto = UpdateCustomerDto(
             name = faker.name().fullName(),
             address = faker.address().fullAddress()
@@ -101,13 +126,11 @@ class CustomerServiceTest(
     @DisplayName("고객을 제거한다.")
     fun removeCustomer() {
         // given
-        val customer = generateCustomer()
+        val customer = initialCustomer
         // when
         this.customerService.removeCustomer(customer.id!!)
         val findCustomer = this.customerRepository.findByIdOrNull(customer.id!!)
         // then
-        assertThat(findCustomer).isNull()
+        assertThat(findCustomer?.deleted).isTrue
     }
-
-
 }

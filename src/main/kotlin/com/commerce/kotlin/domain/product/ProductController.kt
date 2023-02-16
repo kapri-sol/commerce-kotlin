@@ -3,8 +3,8 @@ package com.commerce.kotlin.domain.product
 import com.commerce.kotlin.common.constant.SESSION_NAME
 import com.commerce.kotlin.common.constant.SessionBody
 import com.commerce.kotlin.domain.product.dto.CreateProductDto
-import com.commerce.kotlin.domain.product.dto.GetProductResponse
-import com.commerce.kotlin.domain.product.dto.PostProductResponse
+import com.commerce.kotlin.domain.product.dto.FindProductResponse
+import com.commerce.kotlin.domain.product.dto.CreateProductResponse
 import com.commerce.kotlin.domain.product.dto.UpdateProductDto
 import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
@@ -26,10 +26,10 @@ class ProductController(
     private val productService: ProductService
 ) {
     @GetMapping("{id}")
-    fun getProduct(@PathVariable("id") productId: Long): GetProductResponse {
+    fun getProduct(@PathVariable("id") productId: Long): FindProductResponse {
         val product = productService.findProductById(productId)
 
-        return GetProductResponse(
+        return FindProductResponse(
             name = product.name,
             description = product.description,
             price = product.price,
@@ -42,11 +42,11 @@ class ProductController(
     fun postProduct(
         authentication: Authentication,
         @RequestBody createProductDto: CreateProductDto
-    ): PostProductResponse {
+    ): CreateProductResponse {
         val sellerId = (authentication.principal as CustomUserDetails).sellerId ?: throw NotFoundException()
         val productId = productService.createProduct(sellerId, createProductDto)
 
-        return PostProductResponse(
+        return CreateProductResponse(
             productId = productId
         )
     }

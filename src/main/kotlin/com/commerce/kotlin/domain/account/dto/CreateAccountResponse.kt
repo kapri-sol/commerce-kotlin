@@ -1,5 +1,5 @@
 package com.commerce.kotlin.domain.account.dto
 
-data class PostAccountResponse (
+data class CreateAccountResponse (
     val id: Long
 )

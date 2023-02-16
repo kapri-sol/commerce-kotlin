@@ -20,7 +20,7 @@ class CustomerService(
             name = createCustomerDto.name,
             address = createCustomerDto.address,
         )
-        account.setCustomer(customer)
+        account.changeCustomer(customer)
         return customerRepository.save(customer).id!!
     }
 

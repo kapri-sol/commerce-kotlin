@@ -2,22 +2,17 @@ package com.commerce.kotlin.account
 
 import com.commerce.kotlin.domain.account.dto.CreateAccountDto
 import com.commerce.kotlin.domain.account.Account
-import com.commerce.kotlin.domain.account.AccountController
-import com.commerce.kotlin.domain.account.AccountService
-import com.commerce.kotlin.domain.account.dto.GetAccountResponse
-import com.commerce.kotlin.domain.account.dto.PostAccountResponse
+import com.commerce.kotlin.domain.account.AccountRepository
+import com.commerce.kotlin.domain.account.dto.FindAccountResponse
+import com.commerce.kotlin.domain.account.dto.CreateAccountResponse
 import com.commerce.kotlin.util.WithMockCustomUser
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
 import org.mockito.Mockito.*
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -29,52 +24,42 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.transaction.annotation.Transactional
 
 
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@Transactional
 @SpringBootTest
 class AccountControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Mock
-    private lateinit var accountService: AccountService
-
-    @InjectMocks
-    private lateinit var accountController: AccountController
-
-    private val faker = Faker()
-
-    @BeforeEach
-    fun init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(accountController).build()
-    }
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Test
     @DisplayName("계정을 생성한다.")
     fun createAccount() {
 
         val createAccountDto = CreateAccountDto(
-            email = this.faker.internet().emailAddress(),
-            phoneNumber = this.faker.phoneNumber().phoneNumber(),
-            password = this.faker.internet().password()
+            email = faker.internet().emailAddress(),
+            phoneNumber = faker.phoneNumber().phoneNumber(),
+            password = faker.internet().password()
         )
 
-        val createAccountResponse = PostAccountResponse(id = 2L)
-
-        doReturn(2L).`when`(accountService).createAccount(createAccountDto)
+        val createAccountResponse = CreateAccountResponse(id = 2L)
 
         this.mockMvc.perform(
             post("/accounts")
-                .content(jacksonObjectMapper().writeValueAsString(createAccountDto))
+                .content(objectMapper.writeValueAsString(createAccountDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isCreated)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(createAccountResponse)))
+            .andExpect(content().json(objectMapper.writeValueAsString(createAccountResponse)))
             .andDo(
-                document("account", requestFields(
+                document(
+                    "account", requestFields(
                         fieldWithPath("email").description("이메일 주소"),
                         fieldWithPath("phoneNumber").description("휴대폰 번호"),
                         fieldWithPath("password").description("비밀번호")
@@ -84,45 +69,45 @@ class AccountControllerTest {
                     )
                 )
             )
-            .andDo(print())
     }
 
     @Test
     @DisplayName("계정 정보를 조회한다.")
-    @WithMockCustomUser(accountId = 2L)
+    @WithMockCustomUser(accountId = 1L)
     fun findMyAccount() {
-        val createAccount = Account(
-            email = faker.internet().emailAddress(),
-            phoneNumber = faker.phoneNumber().phoneNumber(),
-            password = faker.internet().password()
+        val getAccountResponse = FindAccountResponse(
+            email = initialAccount.email,
+            phoneNumber = initialAccount.phoneNumber
         )
-
-        val proxyAccount = ProxyAccount(
-            id = 2L,
-            email = createAccount.email,
-            phoneNumber = createAccount.phoneNumber,
-            password = createAccount.password
-        )
-
-        val getAccountResponse = GetAccountResponse(
-            email = createAccount.email,
-            phoneNumber = createAccount.phoneNumber
-        )
-
-        doReturn(proxyAccount).`when`(accountService).findAccount(2L)
 
         this.mockMvc.perform(get("/accounts/me"))
-            .andDo(print())
             .andExpect(status().isOk)
-            .andExpect(content().json(jacksonObjectMapper().writeValueAsString(getAccountResponse)))
+            .andExpect(content().json(objectMapper.writeValueAsString(getAccountResponse)))
+            .andDo(
+                document(
+                    "account", responseFields(
+                        fieldWithPath("email").description("이메일 주소"),
+                        fieldWithPath("phoneNumber").description("휴대폰 번호"),
+                    )
+                )
+            )
     }
 
     companion object {
-        class ProxyAccount(
-            override val id: Long,
-            email: String,
-            phoneNumber: String,
-            password: String
-        ) : Account(email = email, phoneNumber = phoneNumber, password = password)
+        lateinit var initialAccount: Account
+        val faker = Faker()
+
+        @JvmStatic
+        @BeforeAll
+        fun setup(@Autowired accountRepository: AccountRepository): Unit {
+            initialAccount = accountRepository.save(
+                Account(
+                    email = faker.internet().emailAddress(),
+                    phoneNumber = faker.phoneNumber().phoneNumber(),
+                    password = faker.internet().password()
+                )
+            )
+        }
+
     }
 }

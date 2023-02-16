@@ -5,7 +5,6 @@ import com.commerce.kotlin.domain.seller.Seller
 import jakarta.persistence.*
 import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.Where
-import javax.naming.InsufficientResourcesException
 
 @Where(clause = "deleted IS FALSE")
 @Entity
@@ -37,7 +36,7 @@ class Product(
     var stockQuantity: Int = stockQuantity
         private set
 
-    private var deleted: Boolean = false
+    var deleted: Boolean = false
 
     init {
         if (stockQuantity <= 0) {
@@ -45,7 +44,7 @@ class Product(
         }
     }
 
-    fun setSeller(seller: Seller) {
+    fun connectSeller(seller: Seller) {
         if (this.seller != null) {
             throw Error()
         }

@@ -9,44 +9,62 @@ import com.commerce.kotlin.domain.product.ProductRepository
 import com.commerce.kotlin.domain.seller.SellerRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 @SpringBootTest
-class ProductServiceTest(
-    @Autowired val sellerRepository: SellerRepository,
-    @Autowired val productRepository: ProductRepository,
-    @Autowired val productService: ProductService
-) {
-    val faker = Faker()
+class ProductServiceTest{
+    @Autowired
+    private lateinit var productRepository: ProductRepository
 
-    fun generateSeller(): Seller {
-        val seller = Seller(
-            name = faker.name().fullName(),
-            address = faker.address().fullAddress()
-        )
-        return this.sellerRepository.save(seller)
-    }
+    @Autowired
+    private lateinit var productService: ProductService
 
-    fun generateProduct(): Product {
-        val product = Product(
-            name = faker.commerce().productName(),
-            description = faker.lorem().sentence(),
-            price = faker.commerce().price().toDouble().toInt(),
-            stockQuantity = faker.random().nextInt(1, 1000)
-        )
-        return this.productRepository.save(product)
+    private companion object {
+        lateinit var initialSeller: Seller
+        val initialProducts: ArrayList<Product> = arrayListOf()
+
+        val faker = Faker()
+
+        @JvmStatic
+        @BeforeAll
+        fun init(@Autowired sellerRepository: SellerRepository, @Autowired productRepository: ProductRepository): Unit {
+            initialSeller = sellerRepository.save(
+                Seller(
+                    name = faker.name().fullName(),
+                    address = faker.address().fullAddress()
+                )
+            )
+
+            for (i: Int in 1..3) {
+                initialProducts.add(
+                    productRepository.save(
+                        Product(
+                            name = faker.commerce().productName(),
+                            description = faker.lorem().sentence(),
+                            price = faker.commerce().price().toDouble().toInt(),
+                            stockQuantity = faker.random().nextInt(1, 1000)
+                        )
+                    )
+                )
+            }
+        }
     }
 
     @Test
     @DisplayName("상품을 생성한다.")
     fun createProduct() {
         // given
-        val seller = generateSeller()
+        val seller = initialSeller
+
         val createProductDto = CreateProductDto(
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
@@ -69,7 +87,8 @@ class ProductServiceTest(
     @DisplayName("상품을 검색한다.")
     fun findProduct() {
         // given
-        val product = this.generateProduct()
+        val product = initialProducts[0]
+
         //when
         val findProduct = this.productService.findProductById(product.id!!)
         //then
@@ -84,9 +103,9 @@ class ProductServiceTest(
     @DisplayName("상품의 판매자가 상품 정보를 수정한다.")
     fun updateProduct() {
         // given
-        val seller = generateSeller()
-        val product = generateProduct()
-        product.setSeller(seller)
+        val seller = initialSeller
+        val product = initialProducts[0]
+        product.connectSeller(seller)
         productRepository.saveAndFlush(product)
 
         val updateProductDto = UpdateProductDto(
@@ -114,11 +133,11 @@ class ProductServiceTest(
     @DisplayName("상품을 제거한다.")
     fun removeProduct() {
         // given
-        val product = generateProduct()
+        val product = initialProducts[0]
         // when
         this.productService.removeProduct(productId = product.id!!)
         val removeProduct = this.productRepository.findByIdOrNull(product.id)
         // then
-        assertThat(removeProduct).isNull()
+        assertThat(removeProduct?.deleted).isTrue
     }
 }

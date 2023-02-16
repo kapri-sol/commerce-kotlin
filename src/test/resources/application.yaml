@@ -4,12 +4,14 @@ spring:
     ansi:
       enable: always
   jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
-        highlight_sql: true
+#    hibernate:
+#      ddl-auto: create
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        format_sql: true
+#        use_sql_comments: true
+#        highlight_sql: true
 logging:
   level:
 #    org.hibernate.SQL: DEBUG
