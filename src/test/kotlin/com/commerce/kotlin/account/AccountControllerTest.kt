@@ -20,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.*
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
@@ -65,18 +64,6 @@ class AccountControllerTest {
         )
             .andExpect(status().isCreated)
             .andExpect(content().json(objectMapper.writeValueAsString(createAccountResponse)))
-//            .andDo(
-//                document(
-//                    "account/post-accounts", requestFields(
-//                        fieldWithPath("email").description("이메일 주소"),
-//                        fieldWithPath("phoneNumber").description("휴대폰 번호"),
-//                        fieldWithPath("password").description("비밀번호")
-//                    ),
-//                    responseFields(
-//                        fieldWithPath("id").description("계정 고유번호")
-//                    )
-//                )
-//            )
             .andDo(
                 MockMvcRestDocumentationWrapper.document(
                     identifier = "account/post-accounts",
@@ -110,12 +97,15 @@ class AccountControllerTest {
             phoneNumber = account.phoneNumber
         )
 
-        this.mockMvc.perform(get("/accounts/me"))
+        this.mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/accounts/me")
+        )
             .andExpect(status().isOk)
             .andExpect(content().json(objectMapper.writeValueAsString(getAccountResponse)))
             .andDo(
-                document(
-                    "account/get-accounts", responseFields(
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "get-accounts",
+                    resourceDetails = ResourceSnippetParametersBuilder().responseFields(
                         fieldWithPath("email").description("이메일 주소"),
                         fieldWithPath("phoneNumber").description("휴대폰 번호"),
                     )
