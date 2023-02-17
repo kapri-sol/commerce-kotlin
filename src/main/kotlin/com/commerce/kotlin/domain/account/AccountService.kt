@@ -42,7 +42,7 @@ class AccountService (
         return this.accountRepository.save(createAccount).id ?: throw InternalError()
     }
 
-    fun findAccount(accountId: Long): Account {
+    fun findAccountById(accountId: Long): Account {
         return this.accountRepository.findByIdOrNull(accountId) ?: throw NotFoundException()
     }
 

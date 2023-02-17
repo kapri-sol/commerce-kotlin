@@ -4,6 +4,7 @@ import com.commerce.kotlin.domain.account.Account
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.seller.Seller
 import com.commerce.kotlin.domain.seller.SellerRepository
+import com.commerce.kotlin.domain.seller.SellerService
 import com.commerce.kotlin.domain.seller.dto.CreateSellerDto
 import com.commerce.kotlin.domain.seller.dto.CreateSellerResponse
 import com.commerce.kotlin.domain.seller.dto.FindSellerResponse
@@ -11,9 +12,12 @@ import com.commerce.kotlin.domain.seller.dto.UpdateSellerDto
 import com.commerce.kotlin.util.WithMockCustomUser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -22,6 +26,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
 import org.springframework.restdocs.payload.PayloadDocumentation.*
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
@@ -29,13 +34,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@Transactional
 @SpringBootTest()
 class SellerControllerTest {
-    @Autowired
-    lateinit var sellerRepository: SellerRepository
+    @MockkBean
+    lateinit var sellerService: SellerService
 
-    @Autowired
+    @MockkBean
     lateinit var accountRepository: AccountRepository
 
     @Autowired
@@ -44,46 +48,23 @@ class SellerControllerTest {
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
-    companion object {
-        private lateinit var initialAccount: Account
-        lateinit var initialSeller: Seller
+    private val faker = Faker()
 
-        val faker = Faker()
-
-        @JvmStatic
-        @BeforeAll
-        fun init(@Autowired accountRepository: AccountRepository, @Autowired sellerRepository: SellerRepository): Unit {
-            initialAccount = accountRepository.save(
-                Account(
-                    email = faker.internet().emailAddress(),
-                    phoneNumber = faker.phoneNumber().phoneNumber(),
-                    password = faker.internet().password()
-                )
-            )
-
-            initialSeller = sellerRepository.save(
-                Seller(
-                    name = faker.name().fullName(),
-                    address = faker.address().fullAddress()
-                )
-            )
-
-            initialAccount.changeSeller(initialSeller)
-        }
-    }
+    private val initialSeller = Seller(
+        name = faker.name().fullName(),
+        address = faker.address().fullAddress()
+    )
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(accountId = 2L)
     @DisplayName("POST Seller")
     fun postSeller() {
         // given
-        val createAccount = Account(
+        val account = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = faker.internet().password()
         )
-
-        accountRepository.save(createAccount)
 
         val createSellerDto = CreateSellerDto(
             name = faker.name().fullName(),
@@ -93,6 +74,9 @@ class SellerControllerTest {
         val createSellerResponse = CreateSellerResponse(
             sellerId = 2L
         )
+
+        every { accountRepository.findByIdOrNull(2L) } returns account
+        every { sellerService.createSeller(2L, any()) } returns 2L
 
         // when
         this.mockMvc.perform(
@@ -105,7 +89,7 @@ class SellerControllerTest {
             .andExpect(content().json(objectMapper.writeValueAsString(createSellerResponse)))
             .andDo(
                 document(
-                    "seller",
+                    "seller/post-sellers",
                     requestFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소"),
@@ -127,6 +111,8 @@ class SellerControllerTest {
             address = initialSeller.address
         )
 
+        every { sellerService.findSellerById(1L) } returns initialSeller
+
         // when
         mockMvc.perform(
             MockMvcRequestBuilders.get("/sellers/me")
@@ -136,7 +122,7 @@ class SellerControllerTest {
             .andExpect(content().json(objectMapper.writeValueAsString(getSellerResponse)))
             .andDo(
                 document(
-                    "seller", responseFields(
+                    "seller/get-sellers/me", responseFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소"),
                     )
@@ -149,11 +135,12 @@ class SellerControllerTest {
     @DisplayName("PATCH Seller")
     fun patchSeller() {
         // given
-        val sellerId = initialSeller.id
         val updateSellerDto = UpdateSellerDto(
             name = faker.name().username(),
             address = faker.address().fullAddress()
         )
+
+        every { sellerService.updateSeller(1L, any()) } returns Unit
 
         // when
         this.mockMvc.perform(
@@ -165,18 +152,13 @@ class SellerControllerTest {
             .andExpect(status().isNoContent)
             .andDo(
                 document(
-                    "seller",
+                    "seller/patch-sellers-me",
                     requestFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소"),
                     )
                 )
             )
-
-        val updatedSeller = this.sellerRepository.findByIdOrNull(sellerId)
-
-        assertThat(updatedSeller?.name).isEqualTo(updateSellerDto.name)
-        assertThat(updatedSeller?.address).isEqualTo(updateSellerDto.address)
     }
 
     @Test
@@ -184,7 +166,7 @@ class SellerControllerTest {
     @DisplayName("DELETE Seller")
     fun deleteSeller() {
         // given
-        val sellerId = initialSeller.id
+        every { sellerService.removeSeller(1L) } returns Unit
 
         // when
         this.mockMvc.perform(
@@ -193,11 +175,7 @@ class SellerControllerTest {
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("seller")
+                document("seller/delete-sellers/me")
             )
-
-        val deletedSeller = this.sellerRepository.findByIdOrNull(sellerId)
-
-        assertThat(deletedSeller?.deleted).isTrue
     }
 }

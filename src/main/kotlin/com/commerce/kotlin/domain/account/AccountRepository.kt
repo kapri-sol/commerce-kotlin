@@ -1,6 +1,7 @@
 package com.commerce.kotlin.domain.account
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 
 interface AccountRepository : JpaRepository<Account, Long> {

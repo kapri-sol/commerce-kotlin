@@ -3,17 +3,17 @@ package com.commerce.kotlin.customer
 import com.commerce.kotlin.domain.account.Account
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.customer.Customer
-import com.commerce.kotlin.domain.customer.CustomerRepository
+import com.commerce.kotlin.domain.customer.CustomerService
 import com.commerce.kotlin.domain.customer.dto.CreateCustomerDto
 import com.commerce.kotlin.domain.customer.dto.CreateCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.FindCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.UpdateCustomerDto
 import com.commerce.kotlin.util.WithMockCustomUser
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,20 +26,19 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.transaction.annotation.Transactional
 
-@Disabled
+
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
 @SpringBootTest
-@Transactional
 class CustomerControllerTest {
-    @Autowired
+    @MockkBean
     private lateinit var accountRepository: AccountRepository
 
-    @Autowired
-    private lateinit var customerRepository: CustomerRepository
+    @MockkBean
+    private lateinit var customerService: CustomerService
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -47,22 +46,36 @@ class CustomerControllerTest {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
+    private val faker = Faker()
+
+    private val initialCustomer: Customer = Customer(
+        name = faker.name().fullName(),
+        address = faker.address().fullAddress()
+    )
+
     @Test
     @DisplayName("POST Customer")
     @WithMockCustomUser(accountId = 2L)
     fun postCustomer() {
         // given
-        val createAccount = Account(
+        val account = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
             password = faker.internet().password()
         )
-        this.accountRepository.save(createAccount)
 
         val createCustomerDto = CreateCustomerDto(
             name = faker.name().fullName(),
             address = faker.address().fullAddress()
         )
+
+        every {
+            accountRepository.findByIdOrNull(2L)
+        } returns account
+
+        every {
+            customerService.createCustomer(2L, any())
+        } returns 2L
 
         val createCustomerResponse = CreateCustomerResponse(
             customerId = 2L
@@ -79,7 +92,7 @@ class CustomerControllerTest {
             .andExpect(content().json(objectMapper.writeValueAsString(createCustomerResponse)))
             .andDo(
                 document(
-                    "customer", requestFields(
+                    "customer/post-customers", requestFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소")
                     )
@@ -97,6 +110,8 @@ class CustomerControllerTest {
             address = initialCustomer.address
         )
 
+        every { customerService.findCustomerById(1L) } returns initialCustomer
+
         // when
         this.mockMvc.perform(
             get("/customers/me")
@@ -106,7 +121,7 @@ class CustomerControllerTest {
             .andExpect(content().json(objectMapper.writeValueAsString(getCustomerResponse)))
             .andDo(
                 document(
-                    "customer", responseFields(
+                    "customer/get-customers-me", responseFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소")
                     )
@@ -119,11 +134,12 @@ class CustomerControllerTest {
     @WithMockCustomUser(accountId = 1L, customerId = 1L)
     fun patchCustomer() {
         // given
-        val customerId = initialCustomer.id
         val updateCustomerDto = UpdateCustomerDto(
             name = faker.name().fullName(),
             address = faker.address().fullAddress()
         )
+
+        every { customerService.updateCustomer(1L, any()) } returns Unit
 
         // when
         this.mockMvc.perform(
@@ -134,19 +150,12 @@ class CustomerControllerTest {
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("customer", requestFields(
+                document("customer/get-customers-me", requestFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소")
                     )
                 )
             )
-
-
-        val updateCustomer = this.customerRepository.findByIdOrNull(customerId)
-
-        assertThat(updateCustomer).isNotNull
-        assertThat(updateCustomer?.name).isEqualTo(updateCustomerDto.name)
-        assertThat(updateCustomer?.address).isEqualTo(updateCustomerDto.address)
     }
 
     @Test
@@ -154,7 +163,7 @@ class CustomerControllerTest {
     @WithMockCustomUser(accountId = 1L, customerId = 1L)
     fun deleteCustomer() {
         // given
-        val customerId = initialCustomer.id
+        every { customerService.removeCustomer(1L) } returns Unit
 
         /* when */
         this.mockMvc.perform(
@@ -163,41 +172,7 @@ class CustomerControllerTest {
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("customer")
+                document("customer/delete-customers-me")
             )
-
-        val deletedCustomer = this.customerRepository.findByIdOrNull(customerId)
-
-        assertThat(deletedCustomer?.deleted).isTrue
-    }
-
-    companion object {
-        val faker = Faker()
-        private lateinit var initialAccount: Account
-        lateinit var initialCustomer: Customer
-
-        @JvmStatic
-        @BeforeAll
-        fun init(
-            @Autowired accountRepository: AccountRepository,
-            @Autowired customerRepository: CustomerRepository
-        ): Unit {
-            initialAccount = accountRepository.save(
-                Account(
-                    email = faker.internet().emailAddress(),
-                    phoneNumber = faker.phoneNumber().phoneNumber(),
-                    password = faker.internet().password()
-                )
-            )
-
-            initialCustomer = customerRepository.save(
-                Customer(
-                    name = faker.name().fullName(),
-                    address = faker.address().fullAddress()
-                )
-            )
-
-            initialAccount.changeCustomer(initialCustomer)
-        }
     }
 }

@@ -1,0 +1,46 @@
+= Account
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[resources-get]]
+== GET accounts
+
+==== Curl
+include::{snippets}/account/get-accounts/curl-request.adoc[]
+
+==== Http Request
+include::{snippets}/account/get-accounts/http-request.adoc[]
+
+==== Http Response
+include::{snippets}/account/get-accounts/http-response.adoc[]
+
+==== Request Body
+include::{snippets}/account/get-accounts/request-body.adoc[]
+
+==== Response Body
+include::{snippets}/account/get-accounts/response-body.adoc[]
+
+==== Response Fields
+include::{snippets}/account/get-accounts/response-fields.adoc[]
+
+[[resources-post]]
+== POST accounts
+
+==== Curl
+include::{snippets}/account/get-accounts/curl-request.adoc[]
+
+==== Http Response
+include::{snippets}/account/get-accounts/http-request.adoc[]
+
+==== Http Response
+include::{snippets}/account/get-accounts/http-response.adoc[]
+
+==== Request Body
+include::{snippets}/account/get-accounts/request-body.adoc[]
+
+==== Response Body
+include::{snippets}/account/get-accounts/response-body.adoc[]
+
+==== Response Fiels
+include::{snippets}/account/get-accounts/response-fields.adoc[]

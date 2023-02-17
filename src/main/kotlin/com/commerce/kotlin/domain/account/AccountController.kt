@@ -23,7 +23,7 @@ class AccountController(
     fun getAccount(authentication: Authentication): FindAccountResponse {
         val customUserDetails = authentication.principal as CustomUserDetails
         val accountId = customUserDetails.accountId
-        val account = accountService.findAccount(accountId)
+        val account = accountService.findAccountById(accountId)
         return FindAccountResponse(
             email = account.email,
             phoneNumber = account.phoneNumber

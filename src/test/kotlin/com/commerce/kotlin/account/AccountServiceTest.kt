@@ -119,7 +119,7 @@ class AccountServiceTest {
         // given
         val account = initialAccount
         // when
-        val findAccount = this.accountService.findAccount(account.id!!)
+        val findAccount = this.accountService.findAccountById(account.id!!)
         // then
         assertThat(findAccount.id).isEqualTo(account.id)
         assertThat(findAccount.email).isEqualTo(account.email)
@@ -133,7 +133,7 @@ class AccountServiceTest {
         val accountId = 1000L;
 
         // when
-        val findAccount = { this.accountService.findAccount(accountId) }
+        val findAccount = { this.accountService.findAccountById(accountId) }
 
         // then
         assertThrows<NotFoundException> { findAccount() }

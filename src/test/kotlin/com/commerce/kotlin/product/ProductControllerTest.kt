@@ -4,13 +4,17 @@ import com.commerce.kotlin.domain.account.Account
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.product.Product
 import com.commerce.kotlin.domain.product.ProductRepository
+import com.commerce.kotlin.domain.product.ProductService
 import com.commerce.kotlin.domain.product.dto.CreateProductDto
 import com.commerce.kotlin.domain.product.dto.CreateProductResponse
 import com.commerce.kotlin.domain.product.dto.FindProductResponse
 import com.commerce.kotlin.domain.seller.Seller
 import com.commerce.kotlin.domain.seller.SellerRepository
+import com.commerce.kotlin.domain.seller.SellerService
 import com.commerce.kotlin.util.WithMockCustomUser
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import jakarta.transaction.Transactional
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions
@@ -18,6 +22,7 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
@@ -29,74 +34,30 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@Transactional
 @SpringBootTest
 class ProductControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    @Autowired
-    lateinit var accountRepository: AccountRepository
-
-    @Autowired
-    lateinit var sellerRepository: SellerRepository
-
-    @Autowired
-    lateinit var productRepository: ProductRepository
+    @MockkBean
+    lateinit var productService: ProductService
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
-
-    companion object {
-        private lateinit var initialAccount: Account
-        private lateinit var initialSeller: Seller
-        val initialProducts: ArrayList<Product> = arrayListOf()
-
-        val faker = Faker()
-
-        @JvmStatic
-        @BeforeAll
-        fun init(
-            @Autowired accountRepository: AccountRepository,
-            @Autowired sellerRepository: SellerRepository,
-            @Autowired productRepository: ProductRepository
-        ): Unit {
-            initialAccount = accountRepository.save(
-                Account(
-                    email = faker.internet().emailAddress(),
-                    phoneNumber = faker.phoneNumber().phoneNumber(),
-                    password = faker.internet().password()
-                )
-            )
-
-            initialSeller = sellerRepository.save(
-                Seller(
-                    name = faker.name().fullName(),
-                    address = faker.address().fullAddress()
-                )
-            )
-
-            for (i: Int in 1.. 3) {
-                initialProducts.add(
-                    productRepository.save(
-                        Product(
-                            name = faker.commerce().productName(),
-                            description = faker.lorem().sentence(),
-                            price = faker.commerce().price().toDouble().toInt(),
-                            stockQuantity = faker.random().nextInt(1, 100).toInt()
-                        )
-                    )
-                )
-            }
-        }
-    }
+    private val faker = Faker()
 
     @Test
     @DisplayName("GET Product")
     fun getProduct() {
-        val product = initialProducts[0]
         // given
+        val product = Product(
+            name = faker.commerce().productName(),
+            description = faker.lorem().sentence(),
+            price = faker.commerce().price().toDouble().toInt(),
+            stockQuantity = faker.random().nextInt(1, 100).toInt()
+        )
+
         val getProductResponse = FindProductResponse(
             name = product.name,
             description = product.description,
@@ -104,15 +65,17 @@ class ProductControllerTest {
             stockQuantity = product.stockQuantity
         )
 
+        every { productService.findProductById(1L) } returns product
+
         // when
         mockMvc.perform(
-            get("/products/${product.id}")
+            get("/products/${1L}")
         )
             // then
             .andExpect(status().isOk)
             .andExpect(content().json(objectMapper.writeValueAsString(getProductResponse)))
             .andDo(
-                document("product", responseFields(
+                document("product/get-products", responseFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("description").description("설명"),
                         fieldWithPath("price").description("가격"),
@@ -135,8 +98,10 @@ class ProductControllerTest {
         )
 
         val createProductResponse = CreateProductResponse(
-            productId = 4L
+            productId = 1L
         )
+
+        every { productService.createProduct(1L, any()) } returns 1L
 
         //when
         mockMvc.perform(
@@ -148,7 +113,7 @@ class ProductControllerTest {
             .andExpect(content().json(objectMapper.writeValueAsString(createProductResponse)))
             .andDo(
                 document(
-                    "product", requestFields(
+                    "product/post-products", requestFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("description").description("설명"),
                         fieldWithPath("price").description("가격"),

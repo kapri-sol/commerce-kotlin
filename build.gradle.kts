@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.7.22"
+    id("com.epages.restdocs-api-spec") version "0.17.1"
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
     kotlin("plugin.jpa") version "1.7.22"
@@ -35,7 +36,16 @@ dependencies {
     testImplementation("net.datafaker:datafaker:1.7.0")
     testImplementation("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testImplementation("com.ninja-squad:springmockk:4.0.0")
+    testImplementation("com.epages:restdocs-api-spec-mockmvc:0.17.1")
+}
 
+openapi3 {
+    setServer("http://localhost:8080")
+    title = "My API"
+    description = "My API description"
+    version = "0.1.0"
+    format = "yaml"
 }
 
 tasks.withType<KotlinCompile> {
@@ -49,8 +59,14 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.test {
+    jvmArgs(
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"
+    )
+}
+
 tasks {
-    val snippetsDir = file("$buildDir/generated-snippets")
+//    val snippetsDir = file("$buildDir/generated-snippets")
 
     clean {
         delete("src/main/resources/static/docs")
@@ -58,43 +74,50 @@ tasks {
 
     test {
         useJUnitPlatform()
-        systemProperty("org.springframework.restdocs.outputDir", snippetsDir)
-        outputs.dir(snippetsDir)
+//        systemProperty("org.springframework.restdocs.outputDir", snippetsDir)
+//        outputs.dir(snippetsDir)
     }
 
-    build {
-        dependsOn("copyDocument")
-    }
+//    build {
+//        dependsOn("copyDocument")
+//    }
 
-    asciidoctor {
-        dependsOn(test)
+//    asciidoctor {
+//        dependsOn(test)
+//
+//        attributes(
+//            mapOf("snippets" to snippetsDir)
+//        )
+//        inputs.dir(snippetsDir)
+//
+//        doFirst {
+//            delete("src/main/resources/static/docs")
+//        }
+//    }
 
-        attributes(
-            mapOf("snippets" to snippetsDir)
-        )
-        inputs.dir(snippetsDir)
+//    register<Copy>("copyDocument") {
+//        dependsOn(asciidoctor)
+//
+//        destinationDir = file(".")
+//        from(asciidoctor.get().outputDir) {
+//            into("src/main/resources/static/docs")
+//        }
+//    }
 
-        doFirst {
-            delete("src/main/resources/static/docs")
-        }
-    }
+//    bootJar {
+//        dependsOn(asciidoctor)
+//
+//        from(asciidoctor.get().outputDir) {
+//            into("BOOT-INF/classes/static/docs")
+//        }
+//    }
+}
 
-    register<Copy>("copyDocument") {
-        dependsOn(asciidoctor)
-
-        destinationDir = file(".")
-        from(asciidoctor.get().outputDir) {
-            into("src/main/resources/static/docs")
-        }
-    }
-
-    bootJar {
-        dependsOn(asciidoctor)
-
-        from(asciidoctor.get().outputDir) {
-            into("BOOT-INF/classes/static/docs")
-        }
-    }
+tasks.register<Copy>("copyOasToSwagger") {
+    delete("src/main/resources/static/swagger-ui/openapi3.yaml")
+    from("$buildDir/api-spec/openapi3.yaml")
+    into("src/main/resources/static/swagger-ui/.")
+    dependsOn("openapi3")
 }
 
 allOpen {

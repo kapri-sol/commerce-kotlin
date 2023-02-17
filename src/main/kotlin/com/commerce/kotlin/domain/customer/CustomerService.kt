@@ -15,7 +15,12 @@ class CustomerService(
     private val customerRepository: CustomerRepository
 ) {
     fun createCustomer(accountId: Long, createCustomerDto: CreateCustomerDto): Long {
-        val account = accountRepository.findByIdOrNull(accountId) ?: throw NotFoundException()
+        val account = accountRepository.findByIdOrNull(accountId)
+        println("CREATE CUSTOMER")
+        println(account)
+        if(account == null) {
+            throw NotFoundException()
+        }
         val customer = Customer(
             name = createCustomerDto.name,
             address = createCustomerDto.address,

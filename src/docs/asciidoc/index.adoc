@@ -1,15 +1,7 @@
-include::{snippets}/account/curl-request.adoc[]
+= Spring REST Docs
+:toc: left
+:toclevels: 2
+:sectlinks:
 
-include::{snippets}/account/http-request.adoc[]
-
-include::{snippets}/account/http-response.adoc[]
-
-include::{snippets}/account/httpie-request.adoc[]
-
-include::{snippets}/account/request-body.adoc[]
-
-include::{snippets}/account/request-fields.adoc[]
-
-include::{snippets}/account/response-body.adoc[]
-
-include::{snippets}/account/response-fields.adoc[]
+[[resources-post]]
+== Post
