@@ -40,6 +40,18 @@ dependencies {
     testImplementation("com.epages:restdocs-api-spec-mockmvc:0.17.1")
 }
 
+allOpen {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.MappedSuperclass")
+    annotation("javax.persistence.Embeddable")
+}
+
+noArg {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.MappedSuperclass")
+    annotation("javax.persistence.Embeddable")
+}
+
 openapi3 {
     setServer("http://localhost:8080")
     title = "My API"
@@ -118,16 +130,4 @@ tasks.register<Copy>("copyOasToSwagger") {
     from("$buildDir/api-spec/openapi3.yaml")
     into("src/main/resources/static/swagger-ui/.")
     dependsOn("openapi3")
-}
-
-allOpen {
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.MappedSuperclass")
-    annotation("javax.persistence.Embeddable")
-}
-
-noArg {
-    annotation("javax.persistence.Entity")
-    annotation("javax.persistence.MappedSuperclass")
-    annotation("javax.persistence.Embeddable")
 }

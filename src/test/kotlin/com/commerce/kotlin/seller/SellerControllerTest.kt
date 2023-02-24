@@ -3,13 +3,14 @@ package com.commerce.kotlin.seller
 import com.commerce.kotlin.domain.account.Account
 import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.seller.Seller
-import com.commerce.kotlin.domain.seller.SellerRepository
 import com.commerce.kotlin.domain.seller.SellerService
 import com.commerce.kotlin.domain.seller.dto.CreateSellerDto
 import com.commerce.kotlin.domain.seller.dto.CreateSellerResponse
 import com.commerce.kotlin.domain.seller.dto.FindSellerResponse
 import com.commerce.kotlin.domain.seller.dto.UpdateSellerDto
 import com.commerce.kotlin.util.WithMockCustomUser
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
@@ -17,7 +18,6 @@ import io.mockk.every
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -25,12 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
 import org.springframework.restdocs.payload.PayloadDocumentation.*
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.transaction.annotation.Transactional
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -80,7 +78,7 @@ class SellerControllerTest {
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.post("/sellers")
+            post("/sellers")
                 .content(jacksonObjectMapper().writeValueAsString(createSellerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -88,15 +86,16 @@ class SellerControllerTest {
             .andExpect(status().isCreated)
             .andExpect(content().json(objectMapper.writeValueAsString(createSellerResponse)))
             .andDo(
-                document(
-                    "seller/post-sellers",
-                    requestFields(
-                        fieldWithPath("name").description("이름"),
-                        fieldWithPath("address").description("주소"),
-                    ),
-                    responseFields(
-                        fieldWithPath("sellerId").description("판매자 고유번호")
-                    )
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "seller/post-sellers",
+                    resourceDetails = ResourceSnippetParametersBuilder().tag("Seller")
+                        .responseFields(
+                            fieldWithPath("name").description("이름"),
+                            fieldWithPath("address").description("주소"),
+                        ).responseFields(
+                            fieldWithPath("sellerId").description("판매자 고유번호")
+
+                        )
                 )
             )
     }
@@ -115,14 +114,16 @@ class SellerControllerTest {
 
         // when
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/sellers/me")
+            get("/sellers/me")
         )
             // then
             .andExpect(status().isOk)
             .andExpect(content().json(objectMapper.writeValueAsString(getSellerResponse)))
             .andDo(
-                document(
-                    "seller/get-sellers/me", responseFields(
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "seller/get-sellers/me",
+                    resourceDetails = ResourceSnippetParametersBuilder().tag("Seller")
+                        .responseFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소"),
                     )
@@ -144,19 +145,21 @@ class SellerControllerTest {
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.patch("/sellers/me")
+            patch("/sellers/me")
                 .content(jacksonObjectMapper().writeValueAsString(updateSellerDto))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document(
-                    "seller/patch-sellers-me",
-                    requestFields(
-                        fieldWithPath("name").description("이름"),
-                        fieldWithPath("address").description("주소"),
-                    )
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "seller/patch-sellers-me",
+                    resourceDetails = ResourceSnippetParametersBuilder()
+                        .tag("Seller")
+                        .requestFields(
+                            fieldWithPath("name").description("이름"),
+                            fieldWithPath("address").description("주소"),
+                        )
                 )
             )
     }
@@ -170,12 +173,12 @@ class SellerControllerTest {
 
         // when
         this.mockMvc.perform(
-            MockMvcRequestBuilders.delete("/sellers/me")
+            delete("/sellers/me")
         )
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("seller/delete-sellers/me")
+                MockMvcRestDocumentationWrapper.document("seller/delete-sellers/me")
             )
     }
 }

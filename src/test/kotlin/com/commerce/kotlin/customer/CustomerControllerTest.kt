@@ -9,6 +9,8 @@ import com.commerce.kotlin.domain.customer.dto.CreateCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.FindCustomerResponse
 import com.commerce.kotlin.domain.customer.dto.UpdateCustomerDto
 import com.commerce.kotlin.util.WithMockCustomUser
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -22,10 +24,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
@@ -91,11 +92,13 @@ class CustomerControllerTest {
             .andExpect(status().isCreated)
             .andExpect(content().json(objectMapper.writeValueAsString(createCustomerResponse)))
             .andDo(
-                document(
-                    "customer/post-customers", requestFields(
-                        fieldWithPath("name").description("이름"),
-                        fieldWithPath("address").description("주소")
-                    )
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "customer/post-customers",
+                    resourceDetails = ResourceSnippetParametersBuilder().tag("Customer")
+                        .responseFields(
+                            fieldWithPath("name").description("이름"),
+                            fieldWithPath("address").description("주소")
+                        )
                 )
             )
     }
@@ -120,8 +123,9 @@ class CustomerControllerTest {
             .andExpect(status().isOk)
             .andExpect(content().json(objectMapper.writeValueAsString(getCustomerResponse)))
             .andDo(
-                document(
-                    "customer/get-customers-me", responseFields(
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "customer/get-customers-me",
+                    resourceDetails = ResourceSnippetParametersBuilder().tag("Customer").responseFields(
                         fieldWithPath("name").description("이름"),
                         fieldWithPath("address").description("주소")
                     )
@@ -150,12 +154,15 @@ class CustomerControllerTest {
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("customer/get-customers-me", requestFields(
-                        fieldWithPath("name").description("이름"),
-                        fieldWithPath("address").description("주소")
+                MockMvcRestDocumentationWrapper.document(
+                    identifier = "customer/get-customers-me",
+                    resourceDetails = ResourceSnippetParametersBuilder().tag("Customer")
+                        .responseFields(
+                            fieldWithPath("name").description("이름"),
+                            fieldWithPath("address").description("주소")
+                        )
                     )
                 )
-            )
     }
 
     @Test
@@ -172,7 +179,7 @@ class CustomerControllerTest {
             // then
             .andExpect(status().isNoContent)
             .andDo(
-                document("customer/delete-customers-me")
+                MockMvcRestDocumentationWrapper.document("customer/delete-customers-me")
             )
     }
 }
