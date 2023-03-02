@@ -31,6 +31,10 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.CorsUtils
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -98,6 +102,17 @@ class RestSecurityConfiguration {
     }
 
     @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf(CorsConfiguration.ALL)
+        configuration.allowedMethods = listOf(CorsConfiguration.ALL)
+        configuration.allowedHeaders = listOf(CorsConfiguration.ALL)
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
+
+    @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .authorizeHttpRequests()
@@ -112,6 +127,9 @@ class RestSecurityConfiguration {
             .authenticationEntryPoint(authenticationEntryPoint())
             .accessDeniedHandler(accessDeniedHandler())
             .and()
+            .cors().configurationSource (corsConfigurationSource())
+            .and()
+//            .cors().disable()
             .csrf().disable()
             .build()
     }

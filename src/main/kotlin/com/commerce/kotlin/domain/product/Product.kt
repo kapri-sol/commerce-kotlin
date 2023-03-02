@@ -12,7 +12,8 @@ class Product(
     name: String,
     description: String,
     price: Int,
-    stockQuantity: Int
+    stockQuantity: Int,
+    image: String?
 ) : BaseEntity()
 {
     @GeneratedValue
@@ -25,6 +26,9 @@ class Product(
         private set
 
     var name: String = name
+        private set
+
+    var image: String? = image
         private set
 
     var description: String = description

@@ -31,6 +31,10 @@ class ProductService(
         return this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
     }
 
+    fun findAllProducts(): MutableList<Product> {
+        return this.productRepository.findAll()
+    }
+
     fun updateProduct(productId: Long, sellerId: Long, updateProductDto: UpdateProductDto) {
         val product = this.productRepository.findByIdWithSeller(productId) ?: throw NotFoundException()
 

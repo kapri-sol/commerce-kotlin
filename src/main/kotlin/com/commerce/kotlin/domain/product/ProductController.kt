@@ -2,10 +2,7 @@ package com.commerce.kotlin.domain.product
 
 import com.commerce.kotlin.common.constant.SESSION_NAME
 import com.commerce.kotlin.common.constant.SessionBody
-import com.commerce.kotlin.domain.product.dto.CreateProductDto
-import com.commerce.kotlin.domain.product.dto.FindProductResponse
-import com.commerce.kotlin.domain.product.dto.CreateProductResponse
-import com.commerce.kotlin.domain.product.dto.UpdateProductDto
+import com.commerce.kotlin.domain.product.dto.*
 import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.http.HttpStatus
@@ -25,6 +22,21 @@ import org.springframework.web.bind.annotation.SessionAttribute
 class ProductController(
     private val productService: ProductService
 ) {
+    @GetMapping
+    fun findProducts(): FindProductsResponse {
+        val products = productService.findAllProducts()
+
+        return FindProductsResponse(
+            data = products.map { FindProductResponse(
+                name = it.name,
+                description = it.description,
+                price = it.price,
+                stockQuantity = it.stockQuantity
+            ) },
+            count = products.size
+        )
+    }
+
     @GetMapping("{id}")
     fun getProduct(@PathVariable("id") productId: Long): FindProductResponse {
         val product = productService.findProductById(productId)
