@@ -120,6 +120,7 @@ class RestSecurityConfiguration {
             .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
             .requestMatchers("/docs/**").permitAll()
             .requestMatchers("/static/**").permitAll()
+            .requestMatchers("/files/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilterBefore(authenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)

@@ -21,7 +21,8 @@ class ProductService(
             name = createProductDto.name,
             description = createProductDto.description,
             price = createProductDto.price,
-            stockQuantity = createProductDto.stockQuantity
+            stockQuantity = createProductDto.stockQuantity,
+            image = createProductDto.image
         )
         product.connectSeller(seller)
         return this.productRepository.save(product).id!!
