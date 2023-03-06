@@ -3,10 +3,12 @@ package com.commerce.kotlin.domain.account
 import com.commerce.kotlin.domain.account.dto.CreateAccountDto
 import com.commerce.kotlin.domain.account.dto.FindAccountResponse
 import com.commerce.kotlin.domain.account.dto.CreateAccountResponse
+import com.commerce.kotlin.domain.account.dto.UpdateAccountDto
 import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -35,5 +37,12 @@ class AccountController(
     fun postAccount(@RequestBody createAccountDto: CreateAccountDto): CreateAccountResponse {
         val accountId = this.accountService.createAccount(createAccountDto)
         return CreateAccountResponse(id = accountId)
+    }
+
+    @PatchMapping
+    fun updateAccount(authentication: Authentication, @RequestBody updateAccountDto: UpdateAccountDto) {
+        val customUserDetails = authentication.principal as CustomUserDetails
+        val accountId = customUserDetails.accountId
+        accountService.updateAccount(accountId, updateAccountDto)
     }
 }

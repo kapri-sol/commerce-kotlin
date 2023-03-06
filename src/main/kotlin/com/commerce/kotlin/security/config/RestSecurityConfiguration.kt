@@ -8,6 +8,7 @@ import com.commerce.kotlin.security.filter.RestAuthenticationProcessingFilter
 import com.commerce.kotlin.security.handler.RestAccessDeniedHandler
 import com.commerce.kotlin.security.handler.RestAuthenticationFailureHandler
 import com.commerce.kotlin.security.handler.RestAuthenticationSuccessHandler
+import com.commerce.kotlin.security.handler.RestLogoutSuccessHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,6 +30,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
@@ -102,11 +104,16 @@ class RestSecurityConfiguration {
     }
 
     @Bean
+    fun logoutSuccessHandler(): LogoutSuccessHandler {
+        return RestLogoutSuccessHandler()
+    }
+    @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf(CorsConfiguration.ALL)
+        configuration.allowedOriginPatterns = listOf(CorsConfiguration.ALL)
         configuration.allowedMethods = listOf(CorsConfiguration.ALL)
         configuration.allowedHeaders = listOf(CorsConfiguration.ALL)
+        configuration.allowCredentials = true
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
@@ -128,10 +135,18 @@ class RestSecurityConfiguration {
             .authenticationEntryPoint(authenticationEntryPoint())
             .accessDeniedHandler(accessDeniedHandler())
             .and()
+            .logout()
+            .logoutUrl("/auth/logout")
+            .deleteCookies()
+            .logoutSuccessHandler(logoutSuccessHandler())
+            .and()
             .cors().configurationSource (corsConfigurationSource())
             .and()
-//            .cors().disable()
             .csrf().disable()
+            .headers().frameOptions().disable()
+            .and()
+            .httpBasic().disable()
+            .formLogin().disable()
             .build()
     }
 }

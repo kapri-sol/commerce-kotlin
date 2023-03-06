@@ -48,8 +48,13 @@ class AccountService (
 
     fun updateAccount(accountId: Long, updateAccountDto: UpdateAccountDto) {
         val account = this.accountRepository.findByIdOrNull(accountId) ?: throw NotFoundException()
-        account.updatePhoneNumber(updateAccountDto.phoneNumber!!)
-        account.updatePassword(updateAccountDto.password!!)
+        if(updateAccountDto.phoneNumber !== null) {
+            account.updatePhoneNumber(updateAccountDto.phoneNumber)
+        }
+
+        if(updateAccountDto.password !== null) {
+            account.updatePassword(updateAccountDto.password)
+        }
     }
 
     fun removeAccount(accountId: Long) {
