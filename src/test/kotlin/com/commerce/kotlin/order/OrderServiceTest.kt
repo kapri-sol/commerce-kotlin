@@ -6,11 +6,9 @@ import com.commerce.kotlin.domain.order.OrderService
 import com.commerce.kotlin.domain.order.dto.CreateOrderDto
 import com.commerce.kotlin.domain.order.dto.CreateOrderItemDto
 import com.commerce.kotlin.domain.product.ProductRepository
-import com.commerce.kotlin.product.ProductControllerTest
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -41,9 +39,10 @@ class OrderServiceTest{
             for (i: Int in 1..3) {
                 val product = productRepository.save(
                     Product(
-                        name = faker.commerce().productName(),
+                        title = faker.commerce().productName(),
                         description = faker.lorem().sentence(),
                         price = faker.commerce().price().toDouble().toInt(),
+                        image = "/",
                         stockQuantity = faker.random().nextInt(1, 100).toInt()
                     )
                 )

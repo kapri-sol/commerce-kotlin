@@ -18,7 +18,7 @@ class ProductService(
     fun createProduct(sellerId: Long, createProductDto: CreateProductDto): Long {
         val seller = this.sellerRepository.findByIdOrNull(sellerId) ?: throw NotFoundException()
         val product = Product(
-            name = createProductDto.name,
+            title = createProductDto.name,
             description = createProductDto.description,
             price = createProductDto.price,
             stockQuantity = createProductDto.stockQuantity,

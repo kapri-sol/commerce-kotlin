@@ -36,6 +36,7 @@ class AccountServiceTest {
                 Account(
                     email = faker.internet().emailAddress(),
                     phoneNumber = faker.phoneNumber().phoneNumber(),
+                    name = faker.name().fullName(),
                     password = faker.internet().password()
                 )
             )
@@ -49,6 +50,7 @@ class AccountServiceTest {
         val createAccountDto = CreateAccountDto(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
         // when
@@ -68,6 +70,7 @@ class AccountServiceTest {
         val account = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
         this.accountRepository.save(account)
@@ -75,6 +78,7 @@ class AccountServiceTest {
         val createAccountDto = CreateAccountDto(
             email = account.email,
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 
@@ -94,6 +98,7 @@ class AccountServiceTest {
         val account = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
         this.accountRepository.save(account)
@@ -101,6 +106,7 @@ class AccountServiceTest {
         val createAccountDto = CreateAccountDto(
             email = faker.internet().emailAddress(),
             phoneNumber = account.phoneNumber,
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 
@@ -146,11 +152,13 @@ class AccountServiceTest {
         val createAccount = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
         val account = this.accountRepository.save(createAccount)
         val updateAccountDto = UpdateAccountDto(
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 
@@ -172,6 +180,7 @@ class AccountServiceTest {
         val accountId = 1000L;
         val updateAccountDto = UpdateAccountDto(
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 

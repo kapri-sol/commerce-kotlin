@@ -29,8 +29,8 @@ class CustomerController(
     ): CreateCustomerResponse {
         val customUserDetails = authentication.principal as CustomUserDetails
         val accountId = customUserDetails.accountId
-
         val customerId = this.customerService.createCustomer(accountId, createCustomerDto)
+
         customUserDetails.setCustomerId(customerId)
 
         return CreateCustomerResponse(customerId = customerId)

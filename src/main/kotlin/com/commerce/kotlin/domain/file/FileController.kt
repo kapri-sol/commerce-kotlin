@@ -21,7 +21,7 @@ class FileController(
     fun upload(@RequestParam("file") file: MultipartFile): CreateFileResponse {
         val ext = file.originalFilename?.split(".")?.last()
         val fileName = UUID.randomUUID().toString() + ".${ext}"
-        val filePath = "/Users/${fileName}"
+        val filePath = "/Users/kapri.kim/Desktop/${fileName}"
         if(!file.isEmpty) {
             file.transferTo(File(filePath))
         }

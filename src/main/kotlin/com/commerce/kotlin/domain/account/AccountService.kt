@@ -37,6 +37,7 @@ class AccountService (
         val createAccount = Account(
             email = createAccountDto.email,
             phoneNumber = createAccountDto.phoneNumber,
+            name = createAccountDto.name,
             password = passwordEncoder.encode(createAccountDto.password)
         )
         return this.accountRepository.save(createAccount).id ?: throw InternalError()
@@ -50,6 +51,10 @@ class AccountService (
         val account = this.accountRepository.findByIdOrNull(accountId) ?: throw NotFoundException()
         if(updateAccountDto.phoneNumber !== null) {
             account.updatePhoneNumber(updateAccountDto.phoneNumber)
+        }
+
+        if(updateAccountDto.name !== null) {
+            account.updateName(updateAccountDto.name)
         }
 
         if(updateAccountDto.password !== null) {

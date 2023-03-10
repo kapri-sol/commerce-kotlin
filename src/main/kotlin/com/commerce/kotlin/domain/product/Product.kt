@@ -9,11 +9,11 @@ import org.hibernate.annotations.Where
 @Where(clause = "deleted IS FALSE")
 @Entity
 class Product(
-    name: String,
+    title: String,
     description: String,
+    image: String,
     price: Int,
     stockQuantity: Int,
-    image: String
 ) : BaseEntity()
 {
     @GeneratedValue
@@ -25,12 +25,13 @@ class Product(
     var seller: Seller? = null
         private set
 
-    var name: String = name
+    var title: String = title
         private set
 
     var image: String = image
         private set
 
+    @Column(columnDefinition = "TEXT")
     var description: String = description
         private set
 
@@ -40,7 +41,7 @@ class Product(
     var stockQuantity: Int = stockQuantity
         private set
 
-    var deleted: Boolean = false
+    var deleted: Boolean? = false
 
     init {
         if (stockQuantity <= 0) {
@@ -60,11 +61,15 @@ class Product(
     }
 
     fun changeName(name: String) {
-        this.name = name
+        this.title = name
     }
 
     fun changeDescription(description: String) {
         this.description = description
+    }
+
+    fun changeImage(image: String) {
+        this.image = image
     }
 
     fun increaseQuantity(increaseCount: Int) {

@@ -4,11 +4,15 @@ import jakarta.validation.constraints.NotBlank
 
 data class CreateAccountDto(
     @NotBlank
-    var email: String,
+    val email: String,
 
     @NotBlank
-    var phoneNumber: String,
+    val phoneNumber: String,
 
     @NotBlank
-    var password: String
+    val name: String,
+
+    @NotBlank
+    val password: String
+
 )

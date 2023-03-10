@@ -12,6 +12,7 @@ import org.hibernate.annotations.Where
 class Account(
     email: String,
     phoneNumber: String,
+    name: String,
     password: String,
 ) : BaseEntity() {
     @Id
@@ -35,6 +36,9 @@ class Account(
     var phoneNumber = phoneNumber
         private set
 
+    var name = name
+        private set
+
     var password = password
         private set
 
@@ -46,6 +50,10 @@ class Account(
 
     fun updatePhoneNumber(phoneNumber: String) {
         this.phoneNumber = phoneNumber
+    }
+
+    fun updateName(name: String) {
+        this.name = name
     }
 
     fun updatePassword(password: String) {

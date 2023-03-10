@@ -28,7 +28,8 @@ class AccountController(
         val account = accountService.findAccountById(accountId)
         return FindAccountResponse(
             email = account.email,
-            phoneNumber = account.phoneNumber
+            phoneNumber = account.phoneNumber,
+            name = account.name
         )
     }
 

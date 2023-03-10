@@ -47,6 +47,7 @@ class CustomerServiceTest{
                 Account(
                     email = faker.internet().emailAddress(),
                     phoneNumber = faker.phoneNumber().phoneNumber(),
+                    name = faker.name().fullName(),
                     password = faker.internet().password()
                 )
             )
@@ -70,6 +71,7 @@ class CustomerServiceTest{
             Account(
                 email = faker.internet().emailAddress(),
                 phoneNumber = faker.phoneNumber().phoneNumber(),
+                name = faker.name().fullName(),
                 password = faker.internet().password()
             )
         )

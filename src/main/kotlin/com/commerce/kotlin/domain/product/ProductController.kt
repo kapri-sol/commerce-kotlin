@@ -28,8 +28,10 @@ class ProductController(
 
         return FindProductsResponse(
             data = products.map { FindProductResponse(
-                name = it.name,
+                id = it.id!!,
+                title = it.title,
                 description = it.description,
+                image= it.image,
                 price = it.price,
                 stockQuantity = it.stockQuantity
             ) },
@@ -42,8 +44,10 @@ class ProductController(
         val product = productService.findProductById(productId)
 
         return FindProductResponse(
-            name = product.name,
+            id = product.id!!,
+            title = product.title,
             description = product.description,
+            image= product.image,
             price = product.price,
             stockQuantity = product.stockQuantity
         )

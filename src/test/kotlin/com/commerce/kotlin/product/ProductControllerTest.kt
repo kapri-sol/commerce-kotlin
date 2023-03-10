@@ -1,28 +1,19 @@
 package com.commerce.kotlin.product
 
-import com.commerce.kotlin.domain.account.Account
-import com.commerce.kotlin.domain.account.AccountRepository
 import com.commerce.kotlin.domain.product.Product
-import com.commerce.kotlin.domain.product.ProductRepository
 import com.commerce.kotlin.domain.product.ProductService
 import com.commerce.kotlin.domain.product.dto.CreateProductDto
 import com.commerce.kotlin.domain.product.dto.CreateProductResponse
 import com.commerce.kotlin.domain.product.dto.FindProductResponse
-import com.commerce.kotlin.domain.seller.Seller
-import com.commerce.kotlin.domain.seller.SellerRepository
-import com.commerce.kotlin.domain.seller.SellerService
 import com.commerce.kotlin.util.WithMockCustomUser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import jakarta.transaction.Transactional
 import net.datafaker.Faker
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
@@ -52,14 +43,15 @@ class ProductControllerTest {
     fun getProduct() {
         // given
         val product = Product(
-            name = faker.commerce().productName(),
+            title = faker.commerce().productName(),
             description = faker.lorem().sentence(),
             price = faker.commerce().price().toDouble().toInt(),
-            stockQuantity = faker.random().nextInt(1, 100).toInt()
+            stockQuantity = faker.random().nextInt(1, 100).toInt(),
+            image = "/"
         )
 
         val getProductResponse = FindProductResponse(
-            name = product.name,
+            title = product.title,
             description = product.description,
             price = product.price,
             stockQuantity = product.stockQuantity
@@ -94,7 +86,8 @@ class ProductControllerTest {
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
             price = faker.commerce().price().toDouble().toInt(),
-            stockQuantity = faker.random().nextInt(1, 100).toInt()
+            stockQuantity = faker.random().nextInt(1, 100).toInt(),
+            image = "/"
         )
 
         val createProductResponse = CreateProductResponse(

@@ -43,9 +43,7 @@ class SellerController(
 
         customUserDetails.setSellerId(sellerId)
 
-        return CreateSellerResponse(
-            sellerId = sellerId
-        )
+        return CreateSellerResponse(sellerId = sellerId)
     }
 
     @PatchMapping("me")

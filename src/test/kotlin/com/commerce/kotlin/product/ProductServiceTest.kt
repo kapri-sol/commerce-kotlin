@@ -10,7 +10,6 @@ import com.commerce.kotlin.domain.seller.SellerRepository
 import net.datafaker.Faker
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -48,9 +47,10 @@ class ProductServiceTest{
                 initialProducts.add(
                     productRepository.save(
                         Product(
-                            name = faker.commerce().productName(),
+                            title = faker.commerce().productName(),
                             description = faker.lorem().sentence(),
                             price = faker.commerce().price().toDouble().toInt(),
+                            image = "/",
                             stockQuantity = faker.random().nextInt(1, 1000)
                         )
                     )
@@ -69,6 +69,7 @@ class ProductServiceTest{
             name = faker.commerce().productName(),
             description = faker.lorem().sentence(),
             price = faker.commerce().price().toDouble().toInt(),
+            image = "/",
             stockQuantity = faker.random().nextInt(1, 1000)
         )
         // when
@@ -77,7 +78,7 @@ class ProductServiceTest{
 
         // then
         assertThat(product?.id).isEqualTo(productId)
-        assertThat(product?.name).isEqualTo(createProductDto.name)
+        assertThat(product?.title).isEqualTo(createProductDto.name)
         assertThat(product?.description).isEqualTo(createProductDto.description)
         assertThat(product?.price).isEqualTo(createProductDto.price)
         assertThat(product?.stockQuantity).isEqualTo(createProductDto.stockQuantity)
@@ -93,7 +94,7 @@ class ProductServiceTest{
         val findProduct = this.productService.findProductById(product.id!!)
         //then
         assertThat(product.id).isEqualTo(findProduct.id)
-        assertThat(product.name).isEqualTo(findProduct.name)
+        assertThat(product.title).isEqualTo(findProduct.title)
         assertThat(product.description).isEqualTo(findProduct.description)
         assertThat(product.price).isEqualTo(findProduct.price)
         assertThat(product.stockQuantity).isEqualTo(findProduct.stockQuantity)
@@ -124,7 +125,7 @@ class ProductServiceTest{
 
         // then
         assertThat(updateProduct?.id).isEqualTo(product.id)
-        assertThat(updateProduct?.name).isEqualTo(updateProductDto.name)
+        assertThat(updateProduct?.title).isEqualTo(updateProductDto.name)
         assertThat(updateProduct?.description).isEqualTo(updateProductDto.description)
         assertThat(updateProduct?.stockQuantity).isEqualTo(product.stockQuantity + updateProductDto.increaseQuantityCount!!)
     }

@@ -49,6 +49,7 @@ class AccountControllerTest {
         val createAccountDto = CreateAccountDto(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 
@@ -87,6 +88,7 @@ class AccountControllerTest {
         val account = Account(
             email = faker.internet().emailAddress(),
             phoneNumber = faker.phoneNumber().phoneNumber(),
+            name = faker.name().fullName(),
             password = faker.internet().password()
         )
 
@@ -94,6 +96,7 @@ class AccountControllerTest {
 
         val getAccountResponse = FindAccountResponse(
             email = account.email,
+            name = faker.name().fullName(),
             phoneNumber = account.phoneNumber
         )
 
