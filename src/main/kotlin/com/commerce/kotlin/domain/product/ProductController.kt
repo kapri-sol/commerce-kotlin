@@ -5,6 +5,9 @@ import com.commerce.kotlin.common.constant.SessionBody
 import com.commerce.kotlin.domain.product.dto.*
 import com.commerce.kotlin.security.authentication.CustomUserDetails
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,11 +26,11 @@ class ProductController(
     private val productService: ProductService
 ) {
     @GetMapping
-    fun findProducts(): FindProductsResponse {
-        val products = productService.findAllProducts()
+    fun findProducts(@PageableDefault(page = 0, size = 5) pageable: Pageable): FindProductsResponse {
+        val products = productService.findAllProducts(pageable)
 
         return FindProductsResponse(
-            data = products.map { FindProductResponse(
+            content = products.content.map { FindProductResponse(
                 id = it.id!!,
                 title = it.title,
                 description = it.description,
@@ -35,7 +38,8 @@ class ProductController(
                 price = it.price,
                 stockQuantity = it.stockQuantity
             ) },
-            count = products.size
+            size = products.size,
+            totalPage = products.totalPages,
         )
     }
 

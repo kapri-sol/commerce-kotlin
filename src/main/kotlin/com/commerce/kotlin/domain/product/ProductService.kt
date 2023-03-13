@@ -5,6 +5,8 @@ import com.commerce.kotlin.domain.product.dto.UpdateProductDto
 import com.commerce.kotlin.domain.seller.SellerRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -32,8 +34,8 @@ class ProductService(
         return this.productRepository.findByIdOrNull(productId) ?: throw NotFoundException()
     }
 
-    fun findAllProducts(): MutableList<Product> {
-        return this.productRepository.findAll()
+    fun findAllProducts(pageable: Pageable): Page<Product> {
+        return this.productRepository.findAll(pageable)
     }
 
     fun updateProduct(productId: Long, sellerId: Long, updateProductDto: UpdateProductDto) {

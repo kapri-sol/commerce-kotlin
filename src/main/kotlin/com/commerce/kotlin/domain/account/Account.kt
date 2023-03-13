@@ -33,6 +33,7 @@ class Account(
     var email = email
         private set
 
+    @Column(unique = true)
     var phoneNumber = phoneNumber
         private set
 

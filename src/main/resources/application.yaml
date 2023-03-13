@@ -1,42 +1,29 @@
 spring:
-  output:
-    ansi:
-      enable: always
+  datasource:
+    url: jdbc:h2:~/testdb;AUTO_SERVER=TRUE
   jpa:
     hibernate:
       ddl-auto: create-drop
+    show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
-        show_sql: true
         format_sql: true
         use_sql_comments: true
         highlight_sql: true
-    defer-datasource-initialization: true
   sql:
     init:
       mode: always
-#  cloud:
-#    gcp:
-#      project-id: { product-id }
-#      credentials:
-#        location: ./key.json
-
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false
 logging:
   level:
     org:
       springframework:
         security: debug
       hibernate:
-#        SQL: DEBUG
         type:
           descriptor:
             sql: trace
-
-#  servlet:
-#    session:
-#      cookie:
-#        name: my-cookie
-##        http-only: true
-##        secure: true
-#      tracking-modes: cookie
-#      timeout: 1800
